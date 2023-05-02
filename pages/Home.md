@@ -2,4 +2,4 @@
 
 
 ## High Level Architecture
-![](../media/pictures/HLD.png)
+![](../media/pictures/HLD1.png)
