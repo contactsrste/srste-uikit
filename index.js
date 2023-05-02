@@ -1,17 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
-import DummyApp from './DummyApp';
 import Sandbox from './Sandbox';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    {
-      (process.env.REACT_APP_MODE == "BUNDLE")? <DummyApp/>: ((process.env.REACT_APP_MODE == "RUN")?<App />: <Sandbox/>)
-    }
+    <Sandbox/>
   </React.StrictMode>
 );
 
