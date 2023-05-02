@@ -670,7 +670,7 @@ export const data = {
             },
             "elementId": "repeater_1",
             "slotname": "content",
-            "post_script": "(function(context) {\n        context.props_details.items = new sn_jny.jny_AdminExperienceUtils().getEnhanceJourneyCards();\n})(context);",
+            "post_script": "(function(context) {\n        })(context);",
             "visibility": null,
             "lazy_script": null,
             "scope": "70b67750c7010110eadc357098c26026",

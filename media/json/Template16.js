@@ -49,7 +49,7 @@ export const data = {
           order: "10",
           type: {
             group: "custom",
-            name: "CI Admin Experience - Plugin Card",
+            name: "Install Card",
             id: "04d5765a530011102958ddeeff7b12ec",
             route: "ci-plugin-card",
             props: [
