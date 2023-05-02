@@ -58,7 +58,15 @@ permalink: /
 </div>
 <div class="imagesContainer">
 </div>
-<srs-card></srs-card>
+<div id="root" style="overflow:hidden;max-height:100vh"></div>
+
+<script>
+    window.__SRS__ = {
+        contents: [{"name":"datatable1","tag":"srs-datatable", "overrides": {"list_title": "[[api.helper.getHelloWorld(api)]]"}, "props":{"list_title":"User List","list_subtitle":"User Management","headers":[{"name":"Name","label":"Name","sortable":true,"inline_sort":true},"Email","Phone"],"rows":[{"id":"1","Name":"John Doe","Email":"john.doe@example.com","Phone":"(123) 456-7890"},{"id":"2","Name":"Bill McDonald","Email":"bill.md@example.com","Phone":"(123) 456-7090"}]}}],
+        pageContext: {},
+        functions: {}
+    }
+</script>
 
 <script>
     loadContents();
