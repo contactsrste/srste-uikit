@@ -1,0 +1,194 @@
+---
+layout: default
+title: Home
+nav_order: 1
+description: "Overview of Admin Experience Framework (ACE)"
+permalink: /
+---
+
+<link rel="stylesheet" href="./assets/css/page.css">
+<link rel="stylesheet" href="./assets/css/customstyles.css">
+
+<script type="module" src="./assets/cdn/zero-md.js"></script>
+<script src="./assets/scripts/copyCode.js"></script>
+<div>
+    <div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display:none" id="mySidebar">   
+        <button class="w3-bar-item w3-button w3-large" onclick="menuClose()">Close &times;</button>     
+        <div id="sidebar-items">
+
+        </div>
+    </div>
+
+    <div id="main">
+        <div class="w3-teal">
+            <button id="openNav" class="w3-button w3-teal w3-xlarge" onclick="menuOpen()">&#9776;</button>
+            <div class="w3-container">
+                <h1>Admin Experience Framework - Documentation</h1>
+            </div>
+        </div>        
+    </div>
+</div>
+
+<div class="templateCategories">    
+</div>
+<div class="imagesContainer">
+</div>
+
+<script>
+    loadContents();
+    function loadContents() {        
+        var zeroMDElement = document.createElement("zero-md")
+        zeroMDElement.id = "pageContainer";
+        var page = "Home";
+        var queryString = window.location.search?.substr(1) || "";
+        if(queryString) {
+            var queryStringPairs = queryString.split("&");
+            queryStringPairs.forEach((queryStringPair) => {
+                var queryKeyValue = queryStringPair.split("=");
+                if(queryKeyValue[0] == "page") {
+                    page = queryKeyValue[1];
+                    zeroMDElement.setAttribute("src", "./pages/" + page + ".md" || "./pages/Home.md");
+                }
+            });
+        }else {
+            zeroMDElement.setAttribute("src", "./pages/Home.md");
+        }
+
+        document.getElementById("main").appendChild(zeroMDElement);
+        let sidebarEl = document.getElementById("sidebar-items");
+        if(page == "Home") {
+            sidebarEl.innerHTML = `                
+                <a href="?page=GettingStarted" id="getting_started" class="w3-bar-item w3-button">Getting Started</a>
+                <a href="?page=BuildingExperiences" class="w3-bar-item w3-button">Building Experiences</a>
+                <a href="?page=CreatingPages" class="w3-bar-item w3-button">Creating Pages</a>
+                <a href="?page=CreatingContentTypes" class="w3-bar-item w3-button">Creating Content Types</a>
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+        }else if(page == "GettingStarted") {
+            sidebarEl.innerHTML = `
+                <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
+                <a href="?page=BuildingExperiences" class="w3-bar-item w3-button">Building Experiences</a>
+                <a href="?page=CreatingPages" class="w3-bar-item w3-button">Creating Pages</a>
+                <a href="?page=CreatingContentTypes" class="w3-bar-item w3-button">Creating Content Types</a>
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+        }else if(page == "BuildingExperiences") {
+            sidebarEl.innerHTML = `
+                <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
+                <a href="?page=Setup" class="w3-bar-item w3-button">Setup</a>
+                <a href="?page=Configurations" class="w3-bar-item w3-button">Configurations</a>                
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+        }else if(page == "CreatingPages") {
+            sidebarEl.innerHTML = `
+                <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
+                <a href="?page=StepByStepGuide" class="w3-bar-item w3-button">Step by Step Guide</a>
+                <a href="?page=PageTemplates" class="w3-bar-item w3-button">Page Templates</a>
+                <a href="?page=AddingContentBlocks" class="w3-bar-item w3-button">Adding Content Blocks</a>
+                <a href="?page=AddingModalsPopovers" class="w3-bar-item w3-button">Adding Modals & Popovers</a>
+                <a href="?page=StylingContentBlocks" class="w3-bar-item w3-button">Styling Content Blocks</a>
+                <a href="?page=EventHandling" class="w3-bar-item w3-button">Event Handling</a>
+                <a href="?page=ClientScripting" class="w3-bar-item w3-button">Client Scripting</a>
+                <a href="?page=ClientScriptingAPI" class="w3-bar-item w3-button">Client Scripting API</a>
+                <a href="?page=ClientContext" class="w3-bar-item w3-button">Client Context</a>
+                <a href="?page=DataFlows" class="w3-bar-item w3-button">Data Flows</a>
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+        }else if(page == "CreatingContentTypes") {
+            sidebarEl.innerHTML = `
+                <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
+                <a href="?page=OOBContentBlockType" class="w3-bar-item w3-button">OOTB Content Type & Inventory</a>                
+                <a href="?page=ReusableBlock" class="w3-bar-item w3-button">Reusable Block</a>
+                <a href="?page=CustomType" class="w3-bar-item w3-button">Custom Content Type</a>
+                <a href="?page=GenericBlock" class="w3-bar-item w3-button">Generic Block</a>
+                <a href="?page=DataBlock" class="w3-bar-item w3-button">Data Block</a>
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+        }else if(page == "RuntimeExperience") {
+            sidebarEl.innerHTML = `
+                <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
+                <a href="?page=RegisteringArtifacts" class="w3-bar-item w3-button">Registering Artifacts & Loading Contents</a>
+                <a href="?page=CachingPerformance" class="w3-bar-item w3-button">Caching & Performance</a>
+                <a href="?page=Translations" class="w3-bar-item w3-button">Translations</a>
+                <a href="?page=Telemetry" class="w3-bar-item w3-button">Telemetry</a>
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+        }else {
+            sidebarEl.innerHTML = `
+                <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+        }
+
+        if(page == "Templates") {
+            loadTemplates()
+        }        
+    }
+
+    async function loadTemplates(category, el) {                                    
+        if(category) {
+            let templateCategoryEls = document.querySelectorAll(".templateCategory");
+            templateCategoryEls.forEach((categoryEl) => categoryEl.classList.remove("selected"));
+            if(el) {
+                el.classList.add("selected");
+            }
+        }else {
+            let templateCategoriesEl = document.querySelector(".templateCategories");
+            templateCategoriesEl.innerHTML = `
+                <div class="templateCategory selected" onclick="loadTemplates(null, this)">All</div>
+                <div class="templateCategory" onclick="loadTemplates('Layout', this)">Layouts</div>
+                <div class="templateCategory" onclick="loadTemplates('Container', this)">Container</div>
+                <div class="templateCategory" onclick="loadTemplates('Banner', this)">Banners</div>
+                <div class="templateCategory" onclick="loadTemplates('Contents', this)">Contents</div>
+                <div class="templateCategory" onclick="loadTemplates('ReusableBlock', this)">Reusable Blocks</div>`;
+                
+        }
+
+        let imagesContainer = document.querySelector(".imagesContainer");        
+        let {templateData} = await import("./media/json/getTemplates.js") || [];     
+        if(category && category != "all") {
+            templateData = templateData.filter((templateDataItem) => templateDataItem.category == category);            
+        }   
+        if(imagesContainer) {
+            let templateBlocks = "";
+            templateData.forEach((templateItem) => {
+                templateBlocks = templateBlocks + `<div class="imageContainer">
+                        <div class="column1">
+                            <div class="topicName">${templateItem.topicName}</div>
+                            <div class="topicDescription">${templateItem.topicDescription}</div>
+                            <div class="copyBtn">
+                                <div class="copyCode" name="${templateItem.templateName}" onclick="copyCode(this)">Copy Contents</div>
+                                <div class="copyStatus"></div>
+                            </div>
+                        </div>
+                        <div class="column2"> 
+                            <image src="${templateItem.templateImagePath}" class="templateImage"/>
+                        </div>
+                    </div>
+                `; 
+            });
+
+            imagesContainer.innerHTML = templateBlocks;
+        }        
+    }
+
+    function menuOpen() {
+        document.getElementById("main").style.marginLeft = "25%";
+        document.getElementById("mySidebar").style.width = "25%";
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("openNav").style.display = 'none';
+    }
+    function menuClose() {
+        document.getElementById("main").style.marginLeft = "0%";
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("openNav").style.display = "inline-block";
+    }
+    async function copyCode(elm) {      
+        let templateName = elm.getAttribute("name");        
+        elm.parentElement.querySelector(".copyStatus").innerText = "";        
+        let {data} = await import('./media/json/' + templateName + '.js');  
+        let {getBlockDataToCopy} = await import("./media/json/CommonUtils.js");
+        let updatedData = getBlockDataToCopy(data);
+        await window.navigator.clipboard.writeText(JSON.stringify(updatedData));    
+        await window.navigator.clipboard.readText(); 
+        setTimeout(() => {
+            elm.parentElement.querySelector(".copyStatus").innerText = "Copied!";
+        }, 1000);        
+    }
+</script>
+
+
+</html>
