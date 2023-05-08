@@ -309,17 +309,28 @@ permalink: /
 
         if(page == "Templates") {
             loadTemplates()
+        }else {
+            showEditor(false);
         }        
     }
 
-    async function showEditor() {
+    async function showEditor(showFlag) {
         let imagesContainer = document.querySelector(".imagesContainer");
-        imagesContainer.style.display = "none";
+        let editorNode = document.querySelector("#root");
+        if(showFlag) {
+            imagesContainer.style.display = "none";
+            editorNode.style.display = "";
+        }else {
+            imagesContainer.style.display = "";
+            editorNode.style.display = "none";
+        }
     }
 
     async function loadTemplates(category, el) {     
         let imagesContainer1 = document.querySelector(".imagesContainer");    
         imagesContainer1.style.display = "";
+        let editorNode = document.querySelector("#root");
+        editorNode.style.display = "none";
 
         if(category) {
             let templateCategoryEls = document.querySelectorAll(".templateCategory");
