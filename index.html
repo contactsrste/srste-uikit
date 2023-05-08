@@ -314,7 +314,7 @@ permalink: /
         }        
     }
 
-    async function showEditor(showFlag) {
+    async function showEditor(showFlag, el) {
         let imagesContainer = document.querySelector(".imagesContainer");
         let editorNode = document.querySelector("#root");
         if(showFlag) {
@@ -323,6 +323,11 @@ permalink: /
         }else {
             imagesContainer.style.display = "";
             editorNode.style.display = "none";
+        }
+        let templateCategoryEls = document.querySelectorAll(".templateCategory");
+        templateCategoryEls.forEach((categoryEl) => categoryEl.classList.remove("selected"));
+        if(el) {
+            el.classList.add("selected");
         }
     }
 
@@ -341,7 +346,7 @@ permalink: /
         }else {
             let templateCategoriesEl = document.querySelector(".templateCategories");
             templateCategoriesEl.innerHTML = `
-                <div class="templateCategory selected" onclick="showEditor("Editor", this)">Editor</div>
+                <div class="templateCategory selected" onclick="showEditor(true, this)">Editor</div>
                 <div class="templateCategory" onclick="loadTemplates('Layout', this)">Layouts</div>
                 <div class="templateCategory" onclick="loadTemplates('Container', this)">Container</div>
                 <div class="templateCategory" onclick="loadTemplates('Banner', this)">Banners</div>
