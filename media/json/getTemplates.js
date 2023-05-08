@@ -1,4 +1,11 @@
 export const templateData = [
+    {
+        topicName: "UI Editor",
+        topicDescription: "UI Editor to build your experience pages",
+        templateName: "InlineUIEditor",        
+        templateImagePath: "./media/pictures/UIEditor.png",
+        category: "Editor"
+    },
     {                
         topicName: "Simple Banner",
         topicDescription: "This is a simple banner used on the landing page of ServiceNow.",

@@ -167,7 +167,7 @@ permalink: /
         }else {
             let templateCategoriesEl = document.querySelector(".templateCategories");
             templateCategoriesEl.innerHTML = `
-                <div class="templateCategory selected" onclick="loadTemplates(null, this)">All</div>
+                <div class="templateCategory selected" onclick="loadTemplates("Editor", this)">Editor</div>
                 <div class="templateCategory" onclick="loadTemplates('Layout', this)">Layouts</div>
                 <div class="templateCategory" onclick="loadTemplates('Container', this)">Container</div>
                 <div class="templateCategory" onclick="loadTemplates('Banner', this)">Banners</div>
