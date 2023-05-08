@@ -219,6 +219,9 @@ permalink: /
         functions: {
             "getHelloWorld":   function(api) {
                 return "Hello world!";
+            },
+            "getContents": function(api) {
+                return api.context.previewData || {contents: []};
             }
         },
         mode: "sandbox"
@@ -317,7 +320,7 @@ permalink: /
     async function loadTemplates(category, el) {     
         let imagesContainer1 = document.querySelector(".imagesContainer");    
         imagesContainer1.style.display = "";
-                                  
+
         if(category) {
             let templateCategoryEls = document.querySelectorAll(".templateCategory");
             templateCategoryEls.forEach((categoryEl) => categoryEl.classList.remove("selected"));
