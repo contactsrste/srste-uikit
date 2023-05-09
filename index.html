@@ -328,9 +328,9 @@ permalink: /
             imagesContainer.style.display = "";
             editorNode.style.display = "none";
         }
-        let templateCategoryEls = document.querySelectorAll(".templateCategory");
-        templateCategoryEls.forEach((categoryEl) => categoryEl.classList.remove("selected"));
         if(el) {
+            let templateCategoryEls = document.querySelectorAll(".templateCategory");
+            templateCategoryEls.forEach((categoryEl) => categoryEl.classList.remove("selected"));
             el.classList.add("selected");
         }
     }
@@ -356,7 +356,6 @@ permalink: /
                 <div class="templateCategory" onclick="loadTemplates('Banner', this)">Banners</div>
                 <div class="templateCategory" onclick="loadTemplates('Contents', this)">Contents</div>
                 <div class="templateCategory" onclick="loadTemplates('ReusableBlock', this)">Reusable Blocks</div>`;
-                
         }
 
         let imagesContainer = document.querySelector(".imagesContainer");        
