@@ -401,9 +401,7 @@ permalink: /
         let templateName = elm.getAttribute("name");        
         elm.parentElement.querySelector(".copyStatus").innerText = "";        
         let {data} = await import('./media/json/' + templateName + '.js');  
-        let {getBlockDataToCopy} = await import("./media/json/CommonUtils.js");
-        let updatedData = getBlockDataToCopy(data);
-        await window.navigator.clipboard.writeText(JSON.stringify(updatedData));    
+        await window.navigator.clipboard.writeText(JSON.stringify(data));    
         await window.navigator.clipboard.readText(); 
         setTimeout(() => {
             elm.parentElement.querySelector(".copyStatus").innerText = "Copied!";
