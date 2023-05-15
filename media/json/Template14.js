@@ -1,140 +1,123 @@
 //CTA Card
-export const data = {
-  id: "4d89-ff2c-9b8ab9-3c41-9babb8aa",
-  active: true,
-  name: "Custom Greetings Card",
-  label: "Custom Greetings Card",
-  title: "",
-  subtitle: "",
-  order: "40",
-  type: {
-    group: "element",
-    name: "Carousel Card",
-    id: "34421ba87702011039ac088b3a1061a9",
-    route: "carousel-card",
-    props: [],
-    macroponent: "bf1e8fa47702011039ac088b3a106145",
-  },
-  lazyLoad: "0",
-  children: [
-    {
-      id: "25ba-b069-aaa88a-54ba-98a8e0aa",
-      active: true,
-      name: "Custom Greetings Card Screen",
-      label: "Custom Greetings Card Screen",
-      title: "Customize",
-      subtitle: "Create your bot’s greeting",
-      order: "10",
-      type: {
-        group: "element",
-        name: "Carousel Element",
-        id: "4b921fa87702011039ac088b3a1061e0",
-        route: "carousel-element",
-        props: [
-          { element: "last_reviewed_on", type: "glide_date" },
-          { element: "description", type: "translated_text" },
-          { element: "image", type: "url" },
-          { element: "type", type: "choice" },
-        ],
+export const data = [
+  {
+      "name": "card1",
+      "tag": "mui-card",
+      "props": {
+          "sx": {
+              "p": 3,
+              "mb": 0
+          }
       },
-      lazyLoad: "0",
-      children: [
-        {
-          id: "4065-f16d-8989aa-e56a-a89877bb",
-          active: true,
-          name: "Action View chat settings",
-          label: "Action View chat settings",
-          title: "View greeting settings",
-          subtitle: "",
-          order: "20",
-          type: {
-            group: "action",
-            name: "Button",
-            id: "02c8c279c3e401104b8e88c7c840dde2",
-            route: "button",
-            props: [
-              { element: "action_type", type: "string" },
-              { element: "button_size", type: "string" },
-              { element: "variant", type: "string" },
-              { element: "link", type: "url" },
-              { element: "event_name", type: "string" },
-              { element: "disabled", type: "boolean" },
-              { element: "icon", type: "string" },
-            ],
-            macroponent: "87b330a2536141102958ddeeff7b12b2",
-          },
-          lazyLoad: "0",
-          children: [],
-          props_details: {
-            action_type: "event",
-            button_size: "sm",
-            variant: "secondary",
-            link: "",
-            event_name: "VIEW_CUSTOM_GREETINGS_SETTINGS",
-            disabled: "false",
-            icon: "",
-          },
-          props_details_display: {},
-          props_overrides: {},
-          pageParams: "",
-          style: {},
-          elementId: "7c57",
-          slotname: "",
-          post_script: "",
-          visibility: "",
-          lazy_script: "",
-          scope: "53b1b0e79761011018b2fa98c253afcc",
-          package: "53b1b0e79761011018b2fa98c253afcc",
-          slots: [],
-          block_id: "1a19-bfcd-aabba9-ce0d-9aa8498a",
-          parent_block_id: "fca4-42b4-89baba-9d64-a8a8bebb",
-        },
-      ],
-      props_details: {
-        last_reviewed_on: "",
-        description:
-          "Design and publish unique bot greetings to meet the needs of your org's HR, CSM, and ITSM user groups.",
-        image: "/images/ci_landingexp_greetings.png",
-        type: "Content",
-      },
-      props_details_display: {},
-      props_overrides: {},
-      pageParams: "",
-      style: {},
-      elementId: "6a75",
-      slotname: "",
-      post_script:
-        "(function(context){\n\tcontext.props_details.image = '/images/ci_landingexp_greetings.png';\n})(context);",
-      visibility: "",
-      lazy_script: "",
-      scope: "53b1b0e79761011018b2fa98c253afcc",
-      package: "53b1b0e79761011018b2fa98c253afcc",
-      slots: [],
-      block_id: "fca4-42b4-89baba-9d64-a8a8bebb",
-      parent_block_id: "ca24-9be2-b889ba-6a6e-baba2db8",
-    },
-  ],
-  props_details: {
-    dismissed_on: "",
-    last_action_on: "",
-    last_reviewed_on: "",
-    showDismiss: true,
-  },
-  props_details_display: {},
-  props_overrides: {},
-  pageParams: "",
-  style: { width: "20rem" },
-  elementId: "5138",
-  slotname: "@default",
-  post_script:
-    "(function(context){\n\tvar ciUtil = new sn_oe_sfs.CIUtil();\n\tciUtil.setCtaCardPropsFromContext(context);\n\t\n\tvar isCardNeverReviewed = !context.props_details.last_reviewed_on;\n\tif(isCardNeverReviewed) {\n\t\tcontext.__is_complete = false;\n\t}\n})(context);",
-  visibility: "",
-  lazy_script: "",
-  scope: "53b1b0e79761011018b2fa98c253afcc",
-  package: "53b1b0e79761011018b2fa98c253afcc",
-  __is_complete: false,
-  blockcontext: { provider_name: "" },
-  slots: [],
-  hasChildren: true,
-  block_id: "ca24-9be2-b889ba-6a6e-baba2db8",
-};
+      "children": [
+          {
+              "name": "box",
+              "tag": "mui-box",
+              "props": {
+                  "sx": {
+                      "display": "flex"
+                  }
+              },
+              "children": [
+                  {
+                      "name": "box",
+                      "tag": "mui-box",
+                      "props": {
+                          "sx": {
+                              "display": "flex",
+                              "flexDirection": "column"
+                          }
+                      },
+                      "children": [
+                          {
+                              "name": "card-content",
+                              "tag": "mui-card-content",
+                              "props": {
+                                  "sx": {
+                                      "flex": "1 0 auto"
+                                  }
+                              },
+                              "children": [
+                                  {
+                                      "name": "typography",
+                                      "tag": "mui-typography",
+                                      "props": {
+                                          "component": "div",
+                                          "variant": "h5",
+                                          "color": "text.secondary",
+                                          "sx": {
+                                              "fontWeight": 500
+                                          },
+                                          "text": "Live From Space"
+                                      }
+                                  },
+                                  {
+                                      "name": "typography",
+                                      "tag": "mui-typography",
+                                      "props": {
+                                          "variant": "subtitle1",
+                                          "color": "text.secondary",
+                                          "component": "div",
+                                          "text": "Mac Miller"
+                                      }
+                                  }
+                              ]
+                          },
+                          {
+                              "name": "box",
+                              "tag": "mui-box",
+                              "props": {
+                                  "sx": {
+                                      "display": "flex",
+                                      "alignItems": "center",
+                                      "pl": 1,
+                                      "pb": 1
+                                  }
+                              },
+                              "children": [
+                                  {
+                                      "name": "icon-button",
+                                      "tag": "mui-icon-button",
+                                      "props": {
+                                          "aria-label": "previous",
+                                          "icon": "Info"
+                                      },
+                                      "children": []
+                                  },
+                                  {
+                                      "name": "icon-button",
+                                      "tag": "mui-icon-button",
+                                      "props": {
+                                          "aria-label": "play/pause",
+                                          "icon": "Add"
+                                      },
+                                      "children": []
+                                  },
+                                  {
+                                      "name": "icon-button",
+                                      "tag": "mui-icon-button",
+                                      "props": {
+                                          "aria-label": "next",
+                                          "icon": "Info"
+                                      },
+                                      "children": []
+                                  }
+                              ]
+                          }
+                      ]
+                  },
+                  {
+                      "name": "card-media",
+                      "tag": "mui-card-media",
+                      "props": {
+                          "component": "img",
+                          "image": "https://unsplash.com/photos/3hWg9QKl5k8/download?ixid=MnwxMjA3fDB8MXxzZWFyY2h8MTB8fHZpbnRhZ2UlMjBtdXNpY3x8MHwxfHx8MTY0MDEyNTY4NQ&force=true&w=640",
+                          "height": "240",
+                          "alt": "Live from space album cover"
+                      }
+                  }
+              ]
+          }
+      ]
+  }
+]

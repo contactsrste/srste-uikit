@@ -1,137 +1,370 @@
 //CTA Card
-export const data = {
-  id: "239a-cf31-8aba9b-855e-a98813a9",
-  active: true,
-  name: "Profanity Filter Card",
-  label: "Profanity Filter Card",
-  title: "",
-  subtitle: "",
-  order: "130",
-  type: {
-    group: "element",
-    name: "Carousel Card",
-    id: "34421ba87702011039ac088b3a1061a9",
-    route: "carousel-card",
-    props: [],
-    macroponent: "bf1e8fa47702011039ac088b3a106145",
-  },
-  lazyLoad: "0",
-  children: [
-    {
-      id: "a1ea-04b9-988898-ee56-8a8a9bbb",
-      active: true,
-      name: "Profanity Filter Card Screen 1",
-      label: "Profanity Filter Card Screen 1",
-      title: "Protect",
-      subtitle: "Get Profanity Filter",
-      order: "10",
-      type: {
-        group: "element",
-        name: "Carousel Element",
-        id: "4b921fa87702011039ac088b3a1061e0",
-        route: "carousel-element",
-        props: [
-          { element: "last_reviewed_on", type: "glide_date" },
-          { element: "description", type: "translated_text" },
-          { element: "image", type: "url" },
-          { element: "type", type: "choice" },
-        ],
+export const data = [
+  {
+      "name": "card1",
+      "tag": "mui-card",
+      "props": {
+          "sx": {
+              "p": 3,
+              "mb": 0
+          }
       },
-      lazyLoad: "0",
-      children: [
-        {
-          id: "b874-a6bb-8898ab-7c78-abbb34a8",
-          active: true,
-          name: "CI Profanity Filter plugin Action",
-          label: "CI Profanity Filter plugin Action",
-          title: "Profanity Filter plugin",
-          subtitle: "",
-          order: "10",
-          type: {
-            group: "custom",
-            name: "Install Card",
-            id: "04d5765a530011102958ddeeff7b12ec",
-            route: "ci-plugin-card",
-            props: [
-              { element: "button_label", type: "translated_text" },
-              { element: "image", type: "url" },
-              { element: "link", type: "url" },
-              { element: "icon", type: "string" },
-            ],
-            macroponent: "d796b29a530011102958ddeeff7b128a",
+      "children": [
+          {
+              "name": "card-header",
+              "tag": "mui-card-header",
+              "props": {
+                  "sx": {
+                      "display": "flex",
+                      "alignItems": "center"
+                  },
+                  "title": "Rahul"
+              },
+              "children": [
+                  {
+                      "name": "avatar",
+                      "tag": "mui-avatar",
+                      "props": {
+                          "sx": {
+                              "backgroundColor": "red",
+                              "width": 50,
+                              "height": 50
+                          },
+                          "aria-label": "recipe",
+                          "slotname": "avatar"
+                      },
+                      "children": [
+                          {
+                              "name": "typography",
+                              "tag": "mui-typography",
+                              "props": {
+                                  "variant": "body1",
+                                  "color": "white",
+                                  "text": "R"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "name": "actions-container",
+                      "tag": "srs-container",
+                      "props": {
+                          "slotname": "action"
+                      },
+                      "children": [
+                          {
+                              "name": "open-button",
+                              "tag": "mui-icon-button",
+                              "props": {
+                                  "label": "settings",
+                                  "icon": "Edit"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "name": "typography",
+                      "tag": "mui-typography",
+                      "props": {
+                          "variant": "h6",
+                          "sx": {
+                              "fontWeight": "bold"
+                          },
+                          "text": "Raul"
+                      }
+                  }
+              ]
           },
-          lazyLoad: "0",
-          children: [],
-          props_details: {
-            button_label: "Get Profanity Filter Plugin",
-            image: "",
-            link: "https://store.servicenow.com/sn_appstore_store.do#!/store/application/77d07c3b7352201076d81f8afaf6a7bb",
-            icon: "open-link-right-fill",
-            size: "sm",
+          {
+              "name": "box",
+              "tag": "mui-box",
+              "props": {
+                  "sx": {
+                      "display": "flex",
+                      "gap": 0.5,
+                      "mb": 0.5,
+                      "flowDirection": "row",
+                      "justifyContent": "space-between"
+                  }
+              },
+              "children": [
+                  {
+                      "name": "box",
+                      "tag": "mui-box",
+                      "props": {
+                          "sx": {
+                              "display": "flex"
+                          }
+                      },
+                      "children": [
+                          {
+                              "name": "card-media",
+                              "tag": "mui-card-media",
+                              "props": {
+                                  "component": "img",
+                                  "height": "150px",
+                                  "width": "150px",
+                                  "image": "https://images.pexels.com/photos/2157826/pexels-photo-2157826.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "name": "box",
+                      "tag": "mui-box",
+                      "props": {
+                          "sx": {
+                              "display": "flex"
+                          }
+                      },
+                      "children": [
+                          {
+                              "name": "card-media",
+                              "tag": "mui-card-media",
+                              "props": {
+                                  "component": "img",
+                                  "height": "150",
+                                  "image": "https://images.pexels.com/photos/3280524/pexels-photo-3280524.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750& w=1260"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "name": "box",
+                      "tag": "mui-box",
+                      "props": {
+                          "sx": {
+                              "display": "flex"
+                          }
+                      },
+                      "children": [
+                          {
+                              "name": "card-media",
+                              "tag": "mui-card-media",
+                              "props": {
+                                  "component": "img",
+                                  "height": "150",
+                                  "image": "https://images.pexels.com/photos/2158469/pexels-photo-2158469.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+                                  "slotname": "media"
+                              }
+                          }
+                      ]
+                  }
+              ]
           },
-          props_details_display: {},
-          props_overrides: {},
-          pageParams: "",
-          style: {},
-          elementId: "26bf",
-          slotname: "",
-          post_script:
-            "(function(context) {\n    context.props_details.link = CIPlugin.ProfanityApp().getAppLink();\n\tcontext.props_details.size = 'sm';\n\n})(context);",
-          visibility:
-            "answer = !GlidePluginManager.isActive('com.sn.va.profanity');\n",
-          lazy_script: "",
-          scope: "53b1b0e79761011018b2fa98c253afcc",
-          package: "53b1b0e79761011018b2fa98c253afcc",
-          slots: [],
-          block_id: "bbe1-5456-8a8899-11d5-a9894f99",
-          parent_block_id: "f17f-ba20-9a8ab8-20ff-9abb9c9a",
-        },
-      ],
-      props_details: {
-        last_reviewed_on: "",
-        description:
-          "Keep conversations professional by preventing both users and agents from using prohibited words and phrases.",
-        image: "/images/ci_landingexp_profanityfilter.png",
-        type: "Content",
-      },
-      props_details_display: {},
-      props_overrides: {},
-      pageParams: "",
-      style: {},
-      elementId: "5344",
-      slotname: "",
-      post_script:
-        "(function(context){ \n\t\n\tcontext.props_details.image = '/images/ci_landingexp_profanityfilter.png';\n\tif(GlidePluginManager.isActive('com.sn.va.profanity')) {\n\t\t//State: Profanity Filter has been installed\n\t\tcontext.subtitle = gs.getMessage('Tune the Profanity Filter');\n\t\tcontext.props_details.description = gs.getMessage('Continue to keep conversations professional by preventing both users and agents from using prohibited words and phrases.');\n\t}\n\telse {\n\t\t//State: Install Profanity Filter\n\t\tcontext.subtitle = gs.getMessage('Get Profanity Filter');\n\t\tcontext.props_details.description = gs.getMessage('Keep conversations professional by preventing both users and agents from using prohibited words and phrases.');\n\t\tcontext.__is_complete = false;\n\t}\n\t\n\t\n})(context);",
-      visibility: "",
-      lazy_script: "",
-      scope: "53b1b0e79761011018b2fa98c253afcc",
-      package: "53b1b0e79761011018b2fa98c253afcc",
-      __is_complete: false,
-      slots: [],
-      block_id: "f17f-ba20-9a8ab8-20ff-9abb9c9a",
-      parent_block_id: "d371-d0e2-a9ba8b-4b22-98a8398a",
-    },
-  ],
-  props_details: {
-    dismissed_on: "",
-    last_action_on: "",
-    last_reviewed_on: "",
-    showDismiss: true,
-  },
-  props_details_display: {},
-  props_overrides: {},
-  pageParams: "",
-  style: { width: "20rem" },
-  elementId: "e49c",
-  slotname: "@default",
-  post_script:
-    "(function(context) {\n\tvar ciUtil = new sn_oe_sfs.CIUtil();\n\tciUtil.setCtaCardPropsFromContext(context);\n})(context);",
-  visibility: "",
-  lazy_script: "",
-  scope: "53b1b0e79761011018b2fa98c253afcc",
-  package: "53b1b0e79761011018b2fa98c253afcc",
-  blockcontext: { provider_name: "" },
-  slots: [],
-  hasChildren: true,
-  block_id: "d371-d0e2-a9ba8b-4b22-98a8398a",
-};
+          {
+              "name": "box",
+              "tag": "mui-box",
+              "props": {
+                  "sx": {
+                      "display": "flex",
+                      "gap": 0.5,
+                      "justifyContent": "space-between"
+                  }
+              },
+              "children": [
+                  {
+                      "name": "box",
+                      "tag": "mui-box",
+                      "props": {
+                          "sx": {
+                              "display": "flex"
+                          }
+                      },
+                      "children": [
+                          {
+                              "name": "card-media",
+                              "tag": "mui-card-media",
+                              "props": {
+                                  "component": "img",
+                                  "width": "100%",
+                                  "image": "https://images.pexels.com/photos/33158/leaves-fall-colors-rainbow.jpg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+                                  "slotname": "media"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "name": "box",
+                      "tag": "mui-box",
+                      "props": {
+                          "sx": {
+                              "display": "flex",
+                              "justifyContent": "space-between"
+                          }
+                      },
+                      "children": [
+                          {
+                              "name": "card-media",
+                              "tag": "mui-card-media",
+                              "props": {
+                                  "component": "img",
+                                  "width": "100%",
+                                  "image": "https://images.pexels.com/photos/1161771/pexels-photo-1161771.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+                                  "slotname": "media"
+                              }
+                          }
+                      ]
+                  }
+              ]
+          },
+          {
+              "name": "box",
+              "tag": "mui-box",
+              "props": {
+                  "sx": {
+                      "backgroundColor": "grey",
+                      "p": 3,
+                      "display": "flex",
+                      "justifyContent": "space-between"
+                  }
+              },
+              "children": [
+                  {
+                      "name": "box",
+                      "tag": "mui-box",
+                      "props": {
+                          "sx": {
+                              "display": "flex",
+                              "alignItems": "center"
+                          }
+                      },
+                      "children": [
+                          {
+                              "name": "icon",
+                              "tag": "mui-icon-button",
+                              "props": {
+                                  "path": "mdiCameraIris",
+                                  "title": "Camera",
+                                  "size": 1.3,
+                                  "icon": "Camera"
+                              }
+                          },
+                          {
+                              "name": "typography",
+                              "tag": "mui-typography",
+                              "props": {
+                                  "sx": {
+                                      "ml": 1,
+                                      "fontWeight": "bold"
+                                  },
+                                  "variant": "span",
+                                  "text": "23"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "name": "button",
+                      "tag": "mui-button",
+                      "props": {
+                          "variant": "contained",
+                          "color": "success",
+                          "text": "Visit now"
+                      },
+                      "children": [
+                          {
+                              "name": "typography",
+                              "tag": "mui-typography",
+                              "props": {
+                                  "gutterBottom": true,
+                                  "variant": "h7",
+                                  "color": "text.secondary",
+                                  "sx": {
+                                      "fontWeight": "bold"
+                                  },
+                                  "text": "VISIT NOW"
+                              }
+                          }
+                      ]
+                  }
+              ]
+          },
+          {
+              "name": "card-content",
+              "tag": "mui-card-content",
+              "children": [
+                  {
+                      "name": "typography",
+                      "tag": "mui-typography",
+                      "props": {
+                          "gutterBottom": true,
+                          "variant": "body1",
+                          "color": "text.secondary",
+                          "sx": {
+                              "mb": 1
+                          },
+                          "text": "Photographic rolls"
+                      }
+                  },
+                  {
+                      "name": "typography",
+                      "tag": "mui-typography",
+                      "props": {
+                          "gutterBottom": true,
+                          "variant": "h4",
+                          "color": "text.secondary",
+                          "sx": {
+                              "fontWeight": "bold"
+                          },
+                          "text": "Salou, Tarragona"
+                      }
+                  },
+                  {
+                      "name": "typography",
+                      "tag": "mui-typography",
+                      "props": {
+                          "variant": "body1",
+                          "color": "text.secondary",
+                          "text": "Minim dolor in amet nulla laboris enim dolore consequat proident fugiat..."
+                      }
+                  }
+              ]
+          },
+          {
+              "name": "card-actions",
+              "tag": "mui-card-actions",
+              "children": [
+                  {
+                      "name": "button",
+                      "tag": "mui-button",
+                      "props": {
+                          "size": "small",
+                          "text": "Share"
+                      },
+                      "children": [
+                          {
+                              "name": "typography",
+                              "tag": "mui-typography",
+                              "props": {
+                                  "variant": "body1",
+                                  "color": "text.secondary",
+                                  "text": "SHARE"
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "name": "button",
+                      "tag": "mui-button",
+                      "props": {
+                          "size": "small",
+                          "text": "Learn More"
+                      },
+                      "children": [
+                          {
+                              "name": "typography",
+                              "tag": "mui-typography",
+                              "props": {
+                                  "variant": "body1",
+                                  "color": "text.secondary",
+                                  "text": "LEARN MORE"
+                              }
+                          }
+                      ]
+                  }
+              ]
+          }
+      ]
+  }
+]

@@ -1,238 +1,165 @@
 //Aggregator Card
-export const data = {
-  id: "82fb-5d25-8a98a9-1a9c-88a96eb9",
-  active: true,
-  name: "Styleable container 1",
-  label: "Styleable container 1",
-  title: "",
-  subtitle: "",
-  order: "1",
-  type: {
-    group: "element",
-    name: "Generic Block",
-    id: "4cb9f85453db5110c733ddeeff7b12b4",
-    route: "generic",
-    props: [
-      { element: "component_name", type: "string" },
-      { element: "component_properties", type: "data_object" },
-    ],
-  },
-  lazyLoad: "0",
-  children: [
-    {
-      id: "4205-aa5d-9b8888-a7fc-babb439b",
-      active: true,
-      name: "Chat Settings Card",
-      label: "Chat Settings Card",
-      title: "Chat settings",
-      subtitle: "These are ways to enrich the chat experience.",
-      order: "10",
-      type: {
-        group: "element",
-        name: "Aggregator Card",
-        id: "d18cde96c32101104b8e88c7c840dd2f",
-        route: "ace-aggregator-card",
-        props: [
-          { element: "title_style", type: "string" },
-          { element: "save_mode", type: "choice" },
-          { element: "event_name", type: "string" },
-        ],
-        macroponent: "cf3d4cc0c33101104b8e88c7c840ddd8",
+export const data = [
+  {
+      "name": "card1",
+      "tag": "mui-card",
+      "props": {
+          "sx": {
+              "p": 3,
+              "mb": 0
+          }
       },
-      lazyLoad: "0",
-      children: [
-        {
-          id: "b8ea-6d76-bb8a98-7742-8aa8b9bb",
-          active: true,
-          name: "Agent names and avatars",
-          label: "Agent names and avatars",
-          title: "Agent names and avatars",
-          subtitle:
-            "Show agent names and photos to create a more personal agent experience.",
-          order: "10",
-          type: {
-            group: "element",
-            name: "Control Card",
-            id: "1d2d1ad6c32101104b8e88c7c840dd72",
-            route: "",
-            props: [
-              { element: "button_label", type: "translated_text" },
-              { element: "table", type: "string" },
-              { element: "button_event_name", type: "string" },
-              { element: "control_type", type: "string" },
-              { element: "field", type: "string" },
-              { element: "record", type: "string" },
-            ],
+      "children": [
+          {
+              "name": "card-header",
+              "tag": "mui-card-header",
+              "props": {
+                  "sx": "{p: 3}",
+                  "title": "Card Header1",
+                  "subheader": "Card Subheader1"
+              },
+              "children": [
+                  {
+                      "name": "avatar",
+                      "tag": "mui-avatar",
+                      "props": {
+                          "sx": "{bgcolor: purple[500], width: 50, height: 50}",
+                          "aria-label": "recipe",
+                          "src": "https://randomuser.me/api/portraits/women/17.jpg",
+                          "slotname": "avatar"
+                      }
+                  },
+                  {
+                      "name": "actions-container",
+                      "tag": "srs-container",
+                      "props": {
+                          "slotname": "action"
+                      },
+                      "children": [
+                          {
+                              "name": "open-button",
+                              "tag": "mui-button",
+                              "props": {
+                                  "label": "settings"
+                              },
+                              "children": [
+                                  {
+                                      "name": "typography",
+                                      "tag": "mui-typography",
+                                      "props": {
+                                          "variant": "body1",
+                                          "color": "white",
+                                          "sx": "{mb: 3}",
+                                          "text": "Open"
+                                      }
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+              ]
           },
-          lazyLoad: "0",
-          children: [],
-          props_details: {
-            button_label: "",
-            table: "sys_cs_live_agent_setup",
-            button_event_name: "",
-            control_type: "record",
-            field: "show_agent_details",
-            record: "f0acbc4c5f091300e6333654de7313c8",
-          },
-          props_details_display: {},
-          props_overrides: {},
-          pageParams: "",
-          style: {},
-          elementId: "fd37",
-          slotname: "",
-          post_script: "",
-          visibility: "",
-          lazy_script: "",
-          scope: "53b1b0e79761011018b2fa98c253afcc",
-          package: "53b1b0e79761011018b2fa98c253afcc",
-          slots: [],
-          block_id: "4d4f-e361-b9aa89-5669-9b9bcbba",
-          parent_block_id: "491b-0d95-bba998-1d70-89b85f98",
-        },
-        {
-          id: "de0f-fe24-88b8ba-53da-88a92dab",
-          active: true,
-          name: "Agent name in header",
-          label: "Agent name in header",
-          title: "Agent name in header",
-          subtitle: "Show the agent's name at the top of the chat client",
-          order: "20",
-          type: {
-            group: "element",
-            name: "Control Card",
-            id: "1d2d1ad6c32101104b8e88c7c840dd72",
-            route: "",
-            props: [
-              { element: "button_label", type: "translated_text" },
-              { element: "table", type: "string" },
-              { element: "button_event_name", type: "string" },
-              { element: "control_type", type: "string" },
-              { element: "field", type: "string" },
-              { element: "record", type: "string" },
-            ],
-          },
-          lazyLoad: "0",
-          children: [],
-          props_details: {
-            button_label: "",
-            table: "sys_cs_live_agent_setup",
-            button_event_name: "",
-            control_type: "record",
-            field: "show_agent_name_in_header",
-            record: "f0acbc4c5f091300e6333654de7313c8",
-            disabled: true,
-          },
-          props_details_display: {},
-          props_overrides: {},
-          pageParams: "",
-          style: {},
-          elementId: "1779",
-          slotname: "",
-          post_script:
-            "(function(context){\n\tvar chatSetupGr = new GlideRecord('sys_cs_live_agent_setup');\n\tif(chatSetupGr.get('f0acbc4c5f091300e6333654de7313c8')) {\n\t\tvar shouldShowAgentDetails = (chatSetupGr.getValue('show_agent_details') == \"1\");\n\t\tif(!shouldShowAgentDetails) {\n\t\t\tcontext.props_details.disabled = true;\n\t\t}\n\t}\n})(context);",
-          visibility: "",
-          lazy_script: "",
-          scope: "53b1b0e79761011018b2fa98c253afcc",
-          package: "53b1b0e79761011018b2fa98c253afcc",
-          slots: [],
-          block_id: "6c86-bdce-9bb999-fecb-89897aba",
-          parent_block_id: "491b-0d95-bba998-1d70-89b85f98",
-        },
-        {
-          id: "878b-e995-9b889a-b55c-89b9ef9b",
-          active: true,
-          name: "Transcripts",
-          label: "Transcripts",
-          title: "Transcripts",
-          subtitle:
-            "Allow users to download a copy of the chat they had with the agent.",
-          order: "30",
-          type: {
-            group: "element",
-            name: "Control Card",
-            id: "1d2d1ad6c32101104b8e88c7c840dd72",
-            route: "",
-            props: [
-              { element: "button_label", type: "translated_text" },
-              { element: "table", type: "string" },
-              { element: "button_event_name", type: "string" },
-              { element: "control_type", type: "string" },
-              { element: "field", type: "string" },
-              { element: "record", type: "string" },
-            ],
-          },
-          lazyLoad: "0",
-          children: [],
-          props_details: {
-            button_label: "",
-            table: "sys_cs_live_agent_setup",
-            button_event_name: "",
-            control_type: "record",
-            field: "allow_transcript_download",
-            record: "f0acbc4c5f091300e6333654de7313c8",
-          },
-          props_details_display: {},
-          props_overrides: {},
-          pageParams: "",
-          style: {},
-          elementId: "feff",
-          slotname: "",
-          post_script: "",
-          visibility: "",
-          lazy_script: "",
-          scope: "53b1b0e79761011018b2fa98c253afcc",
-          package: "53b1b0e79761011018b2fa98c253afcc",
-          slots: [],
-          block_id: "2e8a-9e85-b9888b-2e84-a9a8c1ba",
-          parent_block_id: "491b-0d95-bba998-1d70-89b85f98",
-        },
-      ],
-      props_details: {
-        title_style: "",
-        save_mode: "event",
-        event_name: "HANDLE_AGENT_CHAT_CONTROL_CHANGE",
-        footer_description: "<p><br/><br/><br/><br/><br/></p>",
-      },
-      props_details_display: {},
-      props_overrides: {},
-      pageParams: "",
-      style: {},
-      elementId: "97c4",
-      slotname: "@default",
-      post_script:
-        "(function(context){\n\tif(CIPlugin.Profanity().isActive()) {\n\t\tcontext.props_details.footer_description = '<p><br/></p>';\n\t} else {\n\t\tcontext.props_details.footer_description = '<p><br/><br/><br/><br/><br/></p>';\n\t}\n})(context);",
-      visibility: "",
-      lazy_script: "",
-      scope: "53b1b0e79761011018b2fa98c253afcc",
-      package: "53b1b0e79761011018b2fa98c253afcc",
-      isRoot: true,
-      blockcontext: { provider_name: "" },
-      slots: [],
-      block_id: "491b-0d95-bba998-1d70-89b85f98",
-      parent_block_id: "83fe-0b00-ab9a8b-9289-b9a9299b",
-    },
-  ],
-  props_details: {
-    component_name: "sn-styleable-container",
-    component_properties: {
-      styles: {},
-      embedded_styles:
-        "@media screen and (max-width: 600px) {  :host{  --gridtemplatecolumns: 1fr !important;  } }",
-      embeddedStyles: "",
-    },
-  },
-  props_details_display: {},
-  props_overrides: {},
-  pageParams: null,
-  style: { width: "50rem" },
-  elementId: "styleable_container_155db0b0dc0605ed1",
-  slotname: "",
-  post_script: "",
-  visibility: null,
-  lazy_script: null,
-  scope: "5df6db91ebe4011090fa99602a52289e",
-  package: "5df6db91ebe4011090fa99602a52289e",
-  slots: ["@default"],
-  hasChildren: true,
-  block_id: "83fe-0b00-ab9a8b-9289-b9a9299b",
-};
+          {
+              "name": "card-content",
+              "tag": "mui-card-content",
+              "props": {
+                  "sx": "{pl: 3, pr: 3, pt: 0, pb: 3, mb: 0}"
+              },
+              "children": [
+                  {
+                      "name": "typography",
+                      "tag": "mui-typography",
+                      "props": {
+                          "variant": "h5",
+                          "color": "text.secondary",
+                          "sx": {
+                              "fontWeight": "800"
+                          },
+                          "text": "Web Design templates Selection"
+                      }
+                  },
+                  {
+                      "name": "box",
+                      "tag": "mui-box",
+                      "props": {
+                          "sx": {
+                              "display": "flex",
+                              "justifyContent": "space-between",
+                              "gap": 1
+                          }
+                      },
+                      "children": [
+                          {
+                              "name": "link",
+                              "tag": "mui-link",
+                              "props": {
+                                  "href": "#/",
+                                  "sx": {
+                                      "display": "flex"
+                                  }
+                              },
+                              "children": [
+                                  {
+                                      "name": "card-media",
+                                      "tag": "mui-card-media",
+                                      "props": {
+                                          "component": "img",
+                                          "width": "100%",
+                                          "image": "https://images.pexels.com/photos/1789968/pexels-photo-1789968.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+                                          "alt": "Image",
+                                          "sx": {
+                                              "my": 3,
+                                              "borderRadius": 3,
+                                              "flex": 50
+                                          }
+                                      }
+                                  }
+                              ]
+                          },
+                          {
+                              "name": "link",
+                              "tag": "mui-link",
+                              "props": {
+                                  "href": "#/",
+                                  "sx": {
+                                      "display": "flex"
+                                  }
+                              },
+                              "children": [
+                                  {
+                                      "name": "card-media",
+                                      "tag": "mui-card-media",
+                                      "props": {
+                                          "component": "img",
+                                          "width": "100%",
+                                          "image": "https://images.pexels.com/photos/68525/soap-colorful-color-fruit-68525.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+                                          "alt": "Image",
+                                          "sx": {
+                                              "my": 3,
+                                              "borderRadius": 3,
+                                              "flex": 50
+                                          }
+                                      }
+                                  }
+                              ]
+                          }
+                      ]
+                  },
+                  {
+                      "name": "typography",
+                      "tag": "mui-typography",
+                      "props": {
+                          "variant": "body1",
+                          "color": "text.secondary",
+                          "sx": {
+                              "mb": 3,
+                              "color": "#000"
+                          },
+                          "text": "This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add 1 cup of frozen.."
+                      }
+                  }
+              ]
+          }
+      ]
+  }
+]

@@ -94,43 +94,43 @@ export const templateData = [
         category: "Container"
     },
     {
-        topicName: "Settings Card",
-        topicDescription: "Settings Card built using simple card with button content block.",
+        topicName: "Simple Card with Title and subtitle",
+        topicDescription: "Simple Card with Title and subtitle",
         templateName: "Template13",        
         templateImagePath: "./media/pictures/Template13.png",
         category: "Contents"
     },
     {
-        topicName: "CTA Card #1",
-        topicDescription: "Call to action card #1",
+        topicName: "HorizontalSplitCard",
+        topicDescription: "Card with Horizontal split of contents",
         templateName: "Template14",        
         templateImagePath: "./media/pictures/Template14.png",
         category: "Contents"
     },
     {
-        topicName: "CTA Card #2",
-        topicDescription: "Call to action card #2",
+        topicName: "CollaborationCard",
+        topicDescription: "Collaboration Card with Avatar group information along with the current profile info",
         templateName: "Template15",        
         templateImagePath: "./media/pictures/Template15.png",
         category: "Contents"
     },
     {
-        topicName: "CTA Card #3",
-        topicDescription: "Call to action card #3",
+        topicName: "Image Card#1",
+        topicDescription: "Image Gallery Card",
         templateName: "Template16",        
         templateImagePath: "./media/pictures/Template16.png",
         category: "Contents"
     },
     {
-        topicName: "Aggregator Card",
-        topicDescription: "Aggregator Card with few control cards",
+        topicName: "Image Card#2",
+        topicDescription: "Simple Image Gallery Card",
         templateName: "Template17",        
         templateImagePath: "./media/pictures/Template17.png",
         category: "Contents"
     },
     {
-        topicName: "Two Cards Container",
-        topicDescription: "Two Cards Container",
+        topicName: "Single Media Card with Actions",
+        topicDescription: "Single Media Card with Actions",
         templateName: "Template18",        
         templateImagePath: "./media/pictures/Template18.png",
         category: "Contents"
