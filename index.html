@@ -143,7 +143,8 @@ permalink: /
                         tag: "srs-container",
                         props: {
                             styles: {
-                                justifyContent: "flex-end"
+                                display: "flex",
+                                flexDirection: "row-reverse"
                             }
                         },
                         children: [
@@ -152,6 +153,16 @@ permalink: /
                                 tag: "srs-button",
                                 props: {
                                     label: "Apply"
+                                },
+                                children: [
+                                ]
+                            },
+                            {
+                                name: "Resolution",
+                                tag: "srs-select",
+                                props: {
+                                    label: "",
+                                    options: JSON.stringify([{group: true, options: [{label: "Item1", value: "item1"}, {label: "Item2", value: "item2"}]}])
                                 },
                                 children: [
                                 ]
@@ -190,17 +201,50 @@ permalink: /
                                 },
                                 children: [
                                 ]
-                            }, {
+                            },
+                            {
                                 name: "RightContainer",
-                                tag: "srs-contentrenderer",
+                                tag: "srs-container",
                                 props: {
+                                    styles: {
+                                        width: "40vw",
+                                        height: "calc(100vh - 160px)",
+                                        display: "flex", 
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        overflow: "hidden"
+                                    },
+                                    embedded_styles: ""
                                 },
-                                overrides: {
-                                    overrides: "[[api.helper.getContents(api)]]",
-                                    ts: "" + Date.now()
-                                },
-                                children: []
-                            }]
+                                children: [
+                                    {
+                                        name: "RightContainerContent",
+                                        tag: "srs-container",
+                                        props: {
+                                            styles: {
+                                                transform: "scale(calc(100 / 30), calc(100 / 50))",
+                                                transformOrigin: "top left",
+                                                fontSize: "0.5rem"
+                                            },
+                                            embedded_styles: ""
+                                        },
+                                        children: [
+                                            {
+                                                name: "RightContents",
+                                                tag: "srs-contentrenderer",
+                                                props: {
+                                                },
+                                                overrides: {
+                                                    overrides: "[[api.helper.getContents(api)]]",
+                                                    ts: "" + Date.now()
+                                                },
+                                                children: []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }    
+                        ]
                     }]
             },
             {
@@ -213,29 +257,42 @@ permalink: /
                             eventName: "SrsCodeEditor#changed",
                             type: "script",
                             script: `(async function() {
-                        console.log(eventPayload);
-                        console.log(context);
-                        let ctx = context || {};
-                        let codeEditorValue = eventPayload?.payload?.value || "[]";
-                        ctx.pageData = codeEditorValue || [];
-                        return {context: ctx};
-                    })`,
+                                    console.log(eventPayload);
+                                    console.log(context);
+                                    let ctx = context || {};
+                                    let codeEditorValue = eventPayload?.payload?.value || "[]";
+                                    ctx.pageData = codeEditorValue || [];
+                                    return {context: ctx};
+                                })`,
                             stopPropagation: true
                         },
                         {
                             eventName: "SrsButton#clicked",
                             type: "script",
                             script: `(async function() {
-                            debugger;
-                            console.log(eventPayload);
-                            let pageData = context.pageData || "[]";
-                            pageData = JSON.parse(pageData);
-                            let ctx = context || {};
-                            ctx.previewData = JSON.stringify({contents: pageData});
-                            return {context: ctx};
-                        })`,
+                                    debugger;
+                                    console.log(eventPayload);
+                                    let pageData = context.pageData || "[]";
+                                    pageData = JSON.parse(pageData);
+                                    let ctx = context || {};
+                                    ctx.previewData = JSON.stringify({contents: pageData});
+                                    return {context: ctx};
+                                })`,
                             stopPropagation: true
-                        }
+                        },
+                        {
+                            eventName: "SrsSelect#changed",
+                            type: "script",
+                            script: `(async function() {
+                                    debugger;
+                                    let val = eventPayload?.payload?.value;
+                                    let resolution = context.resolution || "";
+                                    let ctx = context || {};
+                                    ctx.resolution = resolution;
+                                    return {context: ctx};
+                                })`,
+                            stopPropagation: true
+                        }   
                     ]
                 }
             }],

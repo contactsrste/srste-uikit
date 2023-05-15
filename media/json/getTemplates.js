@@ -24,25 +24,25 @@ export const templateData = [
         category: "ReusableBlock"
     },
     {                
-        topicName: "Content Page Template with sample card containers",
-        topicDescription: "This is a sample landing page with card containers of varied sizes",
+        topicName: "Image with it's description Card",
+        topicDescription: "Card with an image with it's description",
         templateName: "Template3",
         templateImagePath: "./media/pictures/Template3.png",
         category: "Contents"
     },
     {                
-        topicName: "Section with Cards Repeater",
-        topicDescription: "This is a sample container with section title with cards repeater.",
+        topicName: "ProfileCard",
+        topicDescription: "This is a sample profile card with an avatar, header title, subtitle and description of the profile",
         templateName: "Template4",
         templateImagePath: "./media/pictures/Template4.png",
-        category: "Banner"
+        category: "Contents"
     },
     {                
-        topicName: "Simple Banner container with title and subtitle",
-        topicDescription: "This is a simple Banner container with title and subtitle",
+        topicName: "Image Card with actions",
+        topicDescription: "This is a simple image card with description and actions",
         templateName: "Template5",
         templateImagePath: "./media/pictures/Template5.png",
-        category: "Banner"
+        category: "Contents"
     },
     {                
         topicName: "Home template with one banner and help section",
