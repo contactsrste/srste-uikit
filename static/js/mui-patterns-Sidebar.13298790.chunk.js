@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunksrste=self.webpackChunksrste||[]).push([[6283],{10179:function(s,e,r){r.r(e),r.d(e,{result:function(){return t}});var t={}}}]);
+//# sourceMappingURL=mui-patterns-Sidebar.13298790.chunk.js.map

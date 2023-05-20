@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunksrste=self.webpackChunksrste||[]).push([[3350],{42511:function(s,e,r){r.r(e),r.d(e,{result:function(){return t}});var t={}}}]);
+//# sourceMappingURL=mui-patterns-ActivityFeed.de11294d.chunk.js.map

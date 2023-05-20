@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunksrste=self.webpackChunksrste||[]).push([[4626],{47767:function(s,e,r){r.r(e),r.d(e,{result:function(){return t}});var t={}}}]);
+//# sourceMappingURL=mui-patterns-DataTable.30c46c52.chunk.js.map

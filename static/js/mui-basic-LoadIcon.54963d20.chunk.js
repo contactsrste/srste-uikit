@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunksrste=self.webpackChunksrste||[]).push([[5334],{49666:function(n,t,u){u.r(t),u.d(t,{loadIcon:function(){return c}});var r=u(76127),c=function(n,t){t(r[n])}},11293:function(n,t,u){u.d(t,{Z:function(){return c}});var r=u(42254);function c(n,t){var u=arguments.length>2&&void 0!==arguments[2]?arguments[2]:"Mui",c={};return t.forEach((function(t){c[t]=(0,r.Z)(n,t,u)})),c}}}]);
+//# sourceMappingURL=mui-basic-LoadIcon.54963d20.chunk.js.map
