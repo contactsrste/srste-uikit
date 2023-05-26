@@ -1,7 +1,7 @@
 //Single Banner layout
 export const data = [
   {
-    "name": "TopContainer",
+    "name": "TopContainer1",
     "tag": "srs-container",
     "props": {
       "styles": {
@@ -11,7 +11,7 @@ export const data = [
     },
     "children": [
       {
-        "name": "HeroSection",
+        "name": "HeroSection1",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -27,7 +27,7 @@ export const data = [
         },
         "children": [
           {
-            "name": "HeroContainer",
+            "name": "HeroContainer1",
             "tag": "srs-container",
             "props": {
               "styles": {
@@ -43,7 +43,7 @@ export const data = [
         ]
       },
       {
-        "name": "ContentSection",
+        "name": "ContentSection1",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -65,7 +65,7 @@ export const data = [
         },
         "children": [
           {
-            "name": "LeftContainer",
+            "name": "LeftContainer1",
             "tag": "srs-container",
             "props": {
               "styles": {
@@ -81,7 +81,7 @@ export const data = [
             "children": []
           },
           {
-            "name": "RightContainer",
+            "name": "RightContainer1",
             "tag": "srs-container",
             "props": {
               "styles": {
@@ -96,7 +96,7 @@ export const data = [
                 "children": []
               },
               {
-                "name": "RightContainerTitle",
+                "name": "RightContainerTitle1",
                 "tag": "srs-richtext",
                 "props": {
                   "html_string": "<p style=\"font-size: 24px; font-weight: 600;  padding-left: 0.5rem;\">FAQs<p>"
@@ -104,7 +104,7 @@ export const data = [
                 "children": []
               },
               {
-                "name": "RightContainerHelp",
+                "name": "RightContainerHelp1",
                 "tag": "srs-accordion",
                 "props": {},
                 "children": [
@@ -116,7 +116,7 @@ export const data = [
                     },
                     "children": [
                       {
-                        "name": "AccordionItem1Container",
+                        "name": "AccordionItem1Container1",
                         "tag": "srs-container",
                         "props": {
                           "styles": {
@@ -126,7 +126,7 @@ export const data = [
                         },
                         "children": [
                           {
-                            "name": "AccordionItem1Contents",
+                            "name": "AccordionItem1Contents1",
                             "tag": "srs-richtext",
                             "props": {
                               "html_string": "<p>Use the System Clone application to copy everything in a database from one instance to another. <br /><br /> Cloning is typically used to copy a production instance to a pre-production instance to test changes. Cloning data comes from the most recent, nightly backup. </p>"
@@ -138,14 +138,14 @@ export const data = [
                     ]
                   },
                   {
-                    "name": "AccordionItem2",
+                    "name": "AccordionItem21",
                     "tag": "srs-accordion-item",
                     "props": {
                       "title": "How to rollback a clone?"
                     },
                     "children": [
                       {
-                        "name": "AccordionItem2Container",
+                        "name": "AccordionItem2Container1",
                         "tag": "srs-container",
                         "props": {
                           "styles": {
@@ -155,7 +155,7 @@ export const data = [
                         },
                         "children": [
                           {
-                            "name": "AccordionItem2Contents",
+                            "name": "AccordionItem2Contents1",
                             "tag": "srs-richtext",
                             "props": {
                               "html_string": "<p>Use the System Clone application to copy everything in a database from one instance to another. <br /><br /> Cloning is typically used to copy a production instance to a pre-production instance to test changes. Cloning data comes from the most recent, nightly backup. </p>"
