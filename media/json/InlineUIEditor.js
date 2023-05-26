@@ -1,5 +1,4 @@
 export const getPageDetails = async () => {
-    debugger;
     let onNewFnBtnClicked = `(async function() {
         let elementId = eventPayload?.payload?.id || "";
         if(elementId == "functionsNewBtn") { 
@@ -30,7 +29,7 @@ export const getPageDetails = async () => {
         }else if(elementId == "contextEditor") {        
             ctx.pageData = ctx.pageData || {};        
             ctx.pageData.context = codeEditorValue;    
-        }else {
+        }else if(elementId == "contentEditor") {
             ctx.pageData = ctx.pageData || {};        
             ctx.pageData.contents = codeEditorValue || [];
         }    
@@ -54,38 +53,40 @@ export const getPageDetails = async () => {
         return {context: ctx};
     })`;
 
-    const embeddedCodeTemplate = `<script>
-        document.addEventListener('DOMContentLoaded', function () {
-        // Create the script element
-        var script = document.createElement('script');
-        script.src = 'https://know.srste.in/srste.js';
-        script.defer = true;
+    const embeddedCodeTemplate = `
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
     
-        // Create the link element for the stylesheet
-        var link = document.createElement('link');
-        link.href = 'https://know.srste.in/static/css/main.621ff9de.css';
-        link.rel = 'stylesheet';
-    
-        // Create the div element
-        var div = document.createElement('div');
-        div.id = '__srsteroot__';
-    
-        // Append the elements to the document body
-        document.body.appendChild(script);
-        document.head.appendChild(link);
-        document.body.appendChild(div);
-        });
+    // Create the script element
+    var script = document.createElement('script');
+    script.src = 'https://know.srste.in/srste.js';
+    script.defer = true;
 
-        window.__SRS__ = window.__SRS__ || {};
-        window.__SRS__.mode = "sandbox";
-        window.__SRS__.contents = $$contents$$;
-        window.__SRS__.context = $$context$$;
-        window.__SRS__.functions = $$functions$$;
-    </script>`;
+    // Create the link element for the stylesheet
+    var link = document.createElement('link');
+    link.href = 'https://know.srste.in/static/css/main.621ff9de.css';
+    link.rel = 'stylesheet';
 
-    let getEmbeddedCodeExpression = `data.template.replace('$$contents$$', JSON.stringify(data.contents)).replace('$$context$$', JSON.stringify(data.context)).replace('$$functions$$', JSON.stringify(data.functions))`;
+    // Create the div element
+    var div = document.createElement('div');
+    div.id = '__srsteroot__';
+
+    // Append the elements to the document body
+    document.body.appendChild(script);
+    document.head.appendChild(link);
+    document.body.appendChild(div);
+    });
+    window.__SRS__ = window.__SRS__ || {};
+    window.__SRS__.mode = \"sandbox\";
+    window.__SRS__.contents = $$contents$$;
+    window.__SRS__.context = $$context$$;
+    window.__SRS__.functions = $$functions$$;
+</script>`;
+
+    let getEmbeddedCodeExpression = `data.template.replace('$$contents$$', JSON.stringify(data.contents)).replace('$$context$$', JSON.stringify(data.context, null, 4)).replace('$$functions$$', JSON.stringify(data.functions, null, 4))`;
 
     let showEmbedCodeClicked = `(async function() {
+        debugger;
         let elementId = eventPayload?.payload?.id;   
         let ctx = context || {}; 
         if(elementId == "ShowEmbedCode") {    
@@ -235,7 +236,8 @@ export const getPageDetails = async () => {
         } 
         return {context}
     })`;
-    let onShowEmbeddedCodeModalClosed = `(async function() {    
+    let onShowEmbeddedCodeModalClosed = `(async function() { 
+        debugger;   
         if(eventPayload?.payload?.id == "showEmbeddedCodeModalCancelBtn") { 
             context.showEmbeddedCodeModal = false;
             let currentModal = context.openedModals.pop();
@@ -1711,12 +1713,11 @@ export const getPageDetails = async () => {
                         "elementId": "showEmbeddedCodeContentEditor",
                         "tag": "srs-codeeditor",
                         "props": {
-                            "language": "html",
                             "height": "calc(100vh - 20rem)",
                             "width": "90vw"
                         },
                         "overrides": {
-                            "value": "[[api.context.embeddedCode]]"
+                            "value": "[[api.helper.getEmbeddedCode(api)]]"
                         },
                         "children": []
                     }]
@@ -1852,6 +1853,9 @@ export const getPageDetails = async () => {
                 context: {},
                 functions: {}
             };
+        },
+        "getEmbeddedCode": function(api) {
+            return api.context.embeddedCode;
         }
     };
     return {pageContents, pageContext, pageFunctions};
