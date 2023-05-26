@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunksrste=self.webpackChunksrste||[]).push([[9893],{91362:function(n,e,r){r.r(e),r.d(e,{WrappedComponent:function(){return p},dispatchedEvents:function(){return s},props:function(){return f},slots:function(){return i},styles:function(){return o}});var t=r(50390),u=r(37881),s=["ABOUT#clicked"],c=function(n,e){return null},o="\n    \n",f=[{name:"errorcode",defaultValue:403,type:"number"}],i=[],p=(0,u.Z)(t.forwardRef(c),f)}}]);
-//# sourceMappingURL=basic-templates-ErrorPage.d7afe45b.chunk.js.map
