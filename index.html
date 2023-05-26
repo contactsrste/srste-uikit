@@ -68,6 +68,7 @@
             window.__SRS__.context = editorData.pageContext;
             window.__SRS__.functions = editorData.pageFunctions;
             window.__SRS__.mode = "sandbox";
+            dispatchEvent(new CustomEvent("GLOBAL_CONTENTS_UPDATED", {}));
         } 
     }
     loadEditorData();
