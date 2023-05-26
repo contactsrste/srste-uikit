@@ -1,4 +1,5 @@
 export const getPageDetails = async () => {
+    debugger;
     let onNewFnBtnClicked = `(async function() {
         let elementId = eventPayload?.payload?.id || "";
         if(elementId == "functionsNewBtn") { 

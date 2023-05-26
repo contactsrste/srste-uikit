@@ -59,6 +59,7 @@
 
 <script>
     async function loadEditorData() {
+        debugger;
         let getPageDetails = await import('./media/json/inlineUIEditor.js');
         let editorData = await getPageDetails();
         if(editorData) {
