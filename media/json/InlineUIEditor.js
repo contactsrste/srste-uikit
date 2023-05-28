@@ -3,15 +3,16 @@ export const getPageDetails = async () => {
         let elementId = eventPayload?.payload?.id || "";
         if(elementId == "functionsNewBtn") { 
             context.addFunctionOpenModal = true;
+            return {context};
         }else if(elementId == "modalApplyBtn") { 
             context.addFunctionOpenModal = false; 
             context.pageData = context.pageData || {}; 
             context.pageData.functions = context.pageData.functions || {}; 
             context.pageData.functions[context.tempFunctionName] = "(function() {})"; 
             context.selectedFunctionName = context.tempFunctionName; 
-            context.selectedFunctionCode = "(function() {})"; 
-        } 
-        return {context};
+            context.selectedFunctionCode = "(function() {})";
+            return {context}; 
+        }
     })`;
     let codeEditorChanged = `(async function() {
         console.log(eventPayload);    
@@ -19,21 +20,26 @@ export const getPageDetails = async () => {
         let ctx = context || {};    
         let elementId = eventPayload?.payload?.id;    
         let codeEditorValue = eventPayload?.payload?.value || {};
+        let codeEditorPosition = eventPayload?.payload?.position || {line: 1, column: 0};
         if(elementId == "functionEditor") {
             ctx.pageData = ctx.pageData || {};        
             ctx.pageData.functions = ctx.pageData.functions || {};       
             if(ctx.selectedFunctionName) {
                 ctx.pageData.functions[ctx.selectedFunctionName] = codeEditorValue;
-                ctx.selectedFunctionCode = codeEditorValue;        
-            }    
+                ctx.selectedFunctionCode = codeEditorValue;  
+                ctx.selectedFunctionCodePosition = codeEditorPosition;      
+            } 
+            return {context: ctx};   
         }else if(elementId == "contextEditor") {        
             ctx.pageData = ctx.pageData || {};        
-            ctx.pageData.context = codeEditorValue;    
+            ctx.pageData.context = codeEditorValue;
+            return {context: ctx};    
         }else if(elementId == "contentEditor") {
             ctx.pageData = ctx.pageData || {};        
             ctx.pageData.contents = codeEditorValue || [];
+            return {context: ctx};
         }    
-        return {context: ctx};
+        
     })`;
 
     let buttonClicked = `(async function() {
@@ -49,8 +55,12 @@ export const getPageDetails = async () => {
             let pageFunctions = pageData?.functions || {};    
             pageFunctions = typeof pageFunctions == "string"? JSON.parse(pageFunctions): pageFunctions;  
             ctx.previewData = JSON.stringify({contents: pageContents, context: pageContext, functions: pageFunctions});
+            ctx.contentHistory = ctx.contentHistory || [];
+            ctx.contentHistory.push(pageContents);
+            ctx.contentHistoryIndex = ctx.contentHistoryIndex + 1;
+            return {context: ctx};
         }
-        return {context: ctx};
+        
     })`;
 
     const embeddedCodeTemplate = `
@@ -86,7 +96,7 @@ export const getPageDetails = async () => {
     let getEmbeddedCodeExpression = `data.template.replace('$$contents$$', JSON.stringify(data.contents)).replace('$$context$$', JSON.stringify(data.context, null, 4)).replace('$$functions$$', JSON.stringify(data.functions, null, 4))`;
 
     let showEmbedCodeClicked = `(async function() {
-        debugger;
+        
         let elementId = eventPayload?.payload?.id;   
         let ctx = context || {}; 
         if(elementId == "ShowEmbedCode") {    
@@ -101,17 +111,66 @@ export const getPageDetails = async () => {
             let getEmbeddedCode = new Function("data", "with(data) { return ${getEmbeddedCodeExpression}; }");
             ctx.embeddedCode = getEmbeddedCode({template: \`${embeddedCodeTemplate}\`, contents: pageContents, context: pageContext, functions: pageFunctions});
             ctx.showEmbeddedCodeModal = true;
-            context.openedModals = context.openedModals || [];
-            let currentModal = context.openedModals.pop();
+            ctx.openedModals = ctx.openedModals || [];
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
-                context.openedModals.push(currentModal);
+                ctx[currentModal] = false;
+                ctx.openedModals.push(currentModal);
             }
-            context.openedModals.push("showEmbeddedCodeModal");
+            ctx.openedModals.push("showEmbeddedCodeModal");
+            return {context: ctx};
         }
-        return {context: ctx};
+        
     })`;
 
+    let undoClicked = `(async function() {
+        
+        let elementId = eventPayload?.payload?.id;   
+        if(elementId == "Undo") {   
+            debugger; 
+            let pageData = context.pageData || "{}";
+            pageData = typeof context.pageData == "string"? JSON.parse(pageData): pageData;  
+            if (context.contentHistoryIndex > 0) {  
+                context.contentHistoryIndex = context.contentHistoryIndex - 1;
+                let updatedContentItems = context.contentHistory[context.contentHistoryIndex];
+                context.pageData.contents = updatedContentItems;
+                let previewData = context.previewData || {};
+                if(typeof previewData == "string") {
+                    previewData = JSON.parse(previewData);
+                    previewData.contents = updatedContentItems;
+                }else {
+                    previewData.contents = updatedContentItems;
+                }
+                context.previewData = previewData;
+            }
+            return {context};
+        }
+    })`;
+
+    let redoClicked = `(async function() {
+        
+        let elementId = eventPayload?.payload?.id;   
+        let ctx = context || {}; 
+        if(elementId == "Redo") {  
+            debugger;  
+            let pageData = context.pageData || "{}";
+            pageData = typeof context.pageData == "string"? JSON.parse(pageData): pageData;  
+            if (context.contentHistoryIndex < context.contentHistory.length - 1) {  
+                context.contentHistoryIndex = context.contentHistoryIndex + 1;
+                let updatedContentItems = context.contentHistory[context.contentHistoryIndex];
+                context.pageData.contents = updatedContentItems;
+                let previewData = context.previewData || {};
+                if(typeof previewData == "string") {
+                    previewData = JSON.parse(previewData);
+                    previewData.contents = updatedContentItems;
+                }else {
+                    previewData.contents = updatedContentItems;
+                }
+                context.previewData = previewData;
+                return {context};
+            }
+        }
+    })`;
     
     let selectChanged = `(async function() {    
             
@@ -125,8 +184,8 @@ export const getPageDetails = async () => {
             let selectedFunction = eventPayload?.payload?.value || "";
             context.selectedFunctionName = selectedFunction || "";        
             context.selectedFunctionCode = pageFunctions[selectedFunction] || "";    
+            return {context};
         }    
-        return {context};
     })`;
     let onRemoveFunctionBtnClicked = `(async function() {    
         let elementId = eventPayload?.payload?.id || "";    
@@ -139,6 +198,7 @@ export const getPageDetails = async () => {
                 context.openedModals.push(currentModal);
             }
             context.openedModals.push("removeFunctionOpenModal");
+            return {context} 
         }else if(elementId == "removeFnModalApplyBtn") { 
             context.pageData = context.pageData || {}; 
             context.pageData.functions = context.pageData.functions || {}; 
@@ -147,8 +207,9 @@ export const getPageDetails = async () => {
             context.selectedFunctionName = functionNames && functionNames.length > 0? functionNames[0]: ""; 
             context.selectedFunctionCode = functionNames && functionNames.length > 0? context.pageData.functions[functionNames[0]]: ""; 
             context.removeFunctionOpenModal = false;
+            return {context} 
         } 
-        return {context} 
+        
     })`;
     let onEditFunctionBtnClicked = `(async function() {    
         
@@ -162,6 +223,7 @@ export const getPageDetails = async () => {
                 context.openedModals.push(currentModal);
             }
             context.openedModals.push("editFunctionOpenModal");
+            return {context}
         }else if(elementId == "editFnModalApplyBtn") { 
             context.pageData = context.pageData || {}; 
             context.pageData.functions = context.pageData.functions || {}; 
@@ -170,8 +232,8 @@ export const getPageDetails = async () => {
             context.pageData.functions[context.tempFunctionName] = selectedFunctionCode;
             context.selectedFunctionName = context.tempFunctionName;
             context.editFunctionOpenModal = false;
+            return {context}
         } 
-        return {context} 
     })`;
 
     let onAddFunctionModalClosed = `(async function() {    
@@ -186,8 +248,9 @@ export const getPageDetails = async () => {
                 context[previousModal] = true;
                 context.openedModals.push(previousModal);
             }
+            return {context}
         } 
-        return {context}
+        
     })`;
     
     let onRemoveFunctionModalClosed = `(async function() {    
@@ -202,8 +265,9 @@ export const getPageDetails = async () => {
                 context[previousModal] = true;
                 context.openedModals.push(previousModal);
             }
+            return {context}
         } 
-        return {context}
+        
     })`;
     let onEditFunctionModalClosed = `(async function() {    
         
@@ -218,8 +282,9 @@ export const getPageDetails = async () => {
                 context[previousModal] = true;
                 context.openedModals.push(previousModal);
             }
+            return {context}
         } 
-        return {context}
+        
     })`;
     let onPreviewModalClosed = `(async function() {    
         if(eventPayload?.payload?.id == "previewModalCancelBtn") { 
@@ -233,11 +298,12 @@ export const getPageDetails = async () => {
                 context[previousModal] = true;
                 context.openedModals.push(previousModal);
             } 
+            return {context}
         } 
-        return {context}
+        
     })`;
     let onShowEmbeddedCodeModalClosed = `(async function() { 
-        debugger;   
+           
         if(eventPayload?.payload?.id == "showEmbeddedCodeModalCancelBtn") { 
             context.showEmbeddedCodeModal = false;
             let currentModal = context.openedModals.pop();
@@ -249,13 +315,14 @@ export const getPageDetails = async () => {
                 context[previousModal] = true;
                 context.openedModals.push(previousModal);
             } 
+            return {context}
         } 
-        return {context}
+        
     })`;
     
     let onComponentAddModalClosed = `(async function() {  
-        debugger;  
-        if(eventPayload?.payload?.id == "componentSettingsModalCancelBtn") { 
+          
+        if(eventPayload?.payload?.id == "componentAddModalCancelBtn") { 
             context.componentAddOpenModal = false;
             let currentModal = context.openedModals.pop();
             if(currentModal) {
@@ -267,20 +334,76 @@ export const getPageDetails = async () => {
                 context.openedModals.push(previousModal);
             }
             context.selectedComponentForAdd = "";
+            return {context}
         } 
-        return {context}
+        
+    })`;
+    let onComponentRemoveModalClosed = `(async function() {  
+          
+        if(eventPayload?.payload?.id == "componentRemoveModalCancelBtn") { 
+            context.componentRemoveOpenModal = false;
+            let currentModal = context.openedModals.pop();
+            if(currentModal) {
+                context[currentModal] = false;
+            }
+            let previousModal = context.openedModals.pop();
+            if(previousModal) {
+                context[previousModal] = true;
+                context.openedModals.push(previousModal);
+            }
+            context.selectedComponentToRemove = "";
+            return {context}
+        } 
+        
+    })`;
+    let onComponentSettingsModalClosed = `(async function() {  
+        debugger;
+        if(eventPayload?.payload?.id == "componentSettingsModalCancelBtn") { 
+            context.componentSettingsOpenModal = false;
+            let currentModal = context.openedModals.pop();
+            if(currentModal) {
+                context[currentModal] = false;
+            }
+            let previousModal = context.openedModals.pop();
+            if(previousModal) {
+                context[previousModal] = true;
+                context.openedModals.push(previousModal);
+            }
+            context.selectedComponentForSettings = "";
+            return {context}
+        } 
+        
+    })`;
+    let onComponentAddBlockModalClosed = `(async function() {  
+          
+        if(eventPayload?.payload?.id == "componentAddBlockModalCancelBtn") { 
+            context.componentAddBlockOpenModal = false;
+            let currentModal = context.openedModals.pop();
+            if(currentModal) {
+                context[currentModal] = false;
+            }
+            let previousModal = context.openedModals.pop();
+            if(previousModal) {
+                context[previousModal] = true;
+                context.openedModals.push(previousModal);
+            }
+            context.selectedComponentForAddBlock = "";
+            return {context}
+        } 
+        
     })`;
     let onFunctionNameChanged = `(async function() {    
         let elementId = eventPayload?.payload?.id || "";    
         if(elementId == "functionNameField" || elementId == "editFunctionNameField") { 
-            context.tempFunctionName = eventPayload?.payload?.value; 
+            context.tempFunctionName = eventPayload?.payload?.value;
+            return {context} 
         } 
-        // return {context}
     })`;
 
     let showPreviewScreen = `(async function() {
         let elementId = eventPayload?.payload?.id || "";
         if(elementId == "previewScreen") {
+            debugger;
             context.previewOpenModal = true;
             context.openedModals = context.openedModals || [];
             let currentModal = context.openedModals.pop();
@@ -291,14 +414,15 @@ export const getPageDetails = async () => {
             context.openedModals.push("previewOpenModal");
             context.screenType = "desktop";
             context.screenOrientation = 1;
+            return {context};
         }
-        return {context};
+        
     })`;
 
-    let onAddComponentClicked = `(async function() {    
-        debugger;
+    let onComponentAddClicked = `(async function() {    
+        
         let elementId = eventPayload?.payload?.id || "";    
-        console.log("in onAddComponentClicked", elementId);
+        console.log("in onComponentAddClicked", elementId);
         context.selectedComponentForAdd = elementId;
         context.componentAddOpenModal = true;
         context.openedModals = context.openedModals || [];
@@ -311,9 +435,95 @@ export const getPageDetails = async () => {
         return {context}
     })`;
 
+    let onComponentRemoveClicked = `(async function() {    
+        
+        let elementId = eventPayload?.payload?.id || "";    
+        console.log("in onComponentRemoveClicked", elementId);
+        context.selectedComponentToRemove = elementId;
+        context.componentRemoveOpenModal = true;
+        context.openedModals = context.openedModals || [];
+        let currentModal = context.openedModals.pop();
+        if(currentModal) {
+            context[currentModal] = false;
+            context.openedModals.push(currentModal);
+        }
+        context.openedModals.push("componentRemoveOpenModal");
+        return {context}
+    })`;
+
+    let onComponentRemoveApplyClicked = `(async function() {    
+        
+        let elementId = eventPayload?.payload?.id || "";    
+        if(elementId == "componentRemoveModalApplyBtn") {
+            debugger;
+            console.log("Removing " + context.selectedComponentToRemove);
+            let contentItems = context.pageData.contents;
+            contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
+            let updatedContentItems = api.removeElement(context.selectedComponentToRemove, contentItems);
+            context.pageData.contents = updatedContentItems;
+            let previewData = context.previewData || {};
+            if(typeof previewData == "string") {
+                previewData = JSON.parse(previewData);
+                previewData.contents = updatedContentItems;
+            }else {
+                previewData.contents = updatedContentItems;
+            }
+            context.previewData = previewData;
+
+            context.contentHistory.push(JSON.parse(JSON.stringify(updatedContentItems)));
+            context.contentHistoryIndex = context.contentHistoryIndex + 1;
+
+            context.componentRemoveOpenModal = false;
+            let currentModal = context.openedModals.pop();
+            if(currentModal) {
+                context[currentModal] = false;
+            }
+            let previousModal = context.openedModals.pop();
+            if(previousModal) {
+                context[previousModal] = true;
+                context.openedModals.push(previousModal);
+            }
+            context.selectedComponentToRemove = "";
+            return {context};
+        }
+    })`;
+
+    let onComponentSettingsClicked = `(async function() {    
+        
+        let elementId = eventPayload?.payload?.id || "";    
+        console.log("in onComponentSettingsClicked", elementId);
+        context.selectedComponentForSettings = elementId;
+        context.componentSettingsOpenModal = true;
+        context.openedModals = context.openedModals || [];
+        let currentModal = context.openedModals.pop();
+        if(currentModal) {
+            context[currentModal] = false;
+            context.openedModals.push(currentModal);
+        }
+        context.openedModals.push("componentSettingsOpenModal");
+        return {context}
+    })`;
+
+    let onComponentAddBlockClicked = `(async function() {    
+        
+        let elementId = eventPayload?.payload?.id || "";    
+        console.log("in onComponentAddBlockClicked", elementId);
+        context.selectedComponentForAddBlock = elementId;
+        context.componentAddBlockOpenModal = true;
+        context.openedModals = context.openedModals || [];
+        let currentModal = context.openedModals.pop();
+        if(currentModal) {
+            context[currentModal] = false;
+            context.openedModals.push(currentModal);
+        }
+        context.openedModals.push("componentAddBlockOpenModal");
+        return {context}
+    })`;
+
     let setPreviewPanelMode = `(async function() {
-        debugger;
+        
         let elementId = eventPayload?.payload?.id || "";
+        let elementMatched = false;
         if(elementId) {
             switch(elementId) {
                 case "FullPreviewScreen": 
@@ -321,33 +531,39 @@ export const getPageDetails = async () => {
                     context.leftContainerColumns = 1;
                     context.rightContainerColumns = 11;
                     context.leftContainerWidth = "5vw";
+                    elementMatched = true;
                     break;
                 case "MorePreviewScreen": 
                     context.previewPanelMode = 2;
-                    context.leftContainerColumns = 3,
-                    context.rightContainerColumns = 9,
-                    context.leftContainerWidth = "23vw"
+                    context.leftContainerColumns = 3;
+                    context.rightContainerColumns = 9;
+                    context.leftContainerWidth = "23vw";
+                    elementMatched = true;
                     break;
                 case "MidPreviewScreen": 
                     context.previewPanelMode = 3;
-                    context.leftContainerColumns = 6,
-                    context.rightContainerColumns = 6,
-                    context.leftContainerWidth = "47vw"
+                    context.leftContainerColumns = 6;
+                    context.rightContainerColumns = 6;
+                    context.leftContainerWidth = "47vw";
+                    elementMatched = true;
                     break;
                 case "LessPreviewScreen":
                     context.previewPanelMode = 4;
-                    context.leftContainerColumns = 9,
-                    context.rightContainerColumns = 3,
-                    context.leftContainerWidth = "70vw"
+                    context.leftContainerColumns = 9;
+                    context.rightContainerColumns = 3;
+                    context.leftContainerWidth = "70vw";
+                    elementMatched = true;
                     break;
-            }
+            } 
         }
-        return {context};
+        if(elementMatched) {
+            return {context};
+        }
+        
     })`;
     let setResponsiveness = `(async function() {
-        
         let elementId = eventPayload?.payload?.id || "";
-        if(elementId) {
+        if(elementId && (elementId == "largeScreen" || elementId == "desktopScreen" || elementId == "laptopScreen" || elementId == "tabletScreen" || elementId == "mobileScreen" || elementId == "rotateScreen" )) {
             switch(elementId) {
                 case "largeScreen": 
                     context.screenType = "largeScreen";
@@ -368,69 +584,68 @@ export const getPageDetails = async () => {
                     context.screenOrientation = (context.screenOrientation  == 1)? 0: 1;
                     break;
             }   
-        }
+            let screenOrientation = context.screenOrientation == 0? "portrait": "landscape"; //landscape = 1 and portrait = 0
 
-        let screenOrientation = context.screenOrientation == 0? "portrait": "landscape"; //landscape = 1 and portrait = 0
+            let screenHeight = "calc(100vh - 12rem)";
+            let screenWidth = "calc(100vw - 10rem)";
 
-        let screenHeight = "calc(100vh - 12rem)";
-        let screenWidth = "calc(100vw - 10rem)";
-
-        if(screenOrientation == "portrait") {
-            screenHeight = "calc(100vw - 10rem)";
-            screenWidth = "calc(100vh - 12rem)";
-        }
-        
-        if(context.screenType) {
-            switch(context.screenType) {
-                case "largeScreen": 
-                    if(screenOrientation == "landscape") {
-                        context.screenWidth = "3840px";
-                        context.screenHeight = "2160px";
-                    }else {
-                        context.screenWidth = "2160px";
-                        context.screenHeight = "3840px";
-                    }
-                    break;
-                case "desktop":
-                    if(screenOrientation == "landscape") {
-                        context.screenWidth = "1920px";
-                        context.screenHeight = "1080px";
-                    }else {
-                        context.screenWidth = "1080px";
-                        context.screenHeight = "1920px";
-                    }
-                    break;
-                case "laptop": 
-                    if(screenOrientation == "landscape") {
-                        context.screenWidth = "1366px";
-                        context.screenHeight = "768px";
-                    }else {
-                        context.screenWidth = "768px";
-                        context.screenHeight = "1366px";
-                    }
-                    break;
-                case "tablet": 
-                    if(screenOrientation == "landscape") {
-                        context.screenWidth = "820px";
-                        context.screenHeight = "1180px";
-                    }else {
-                        context.screenWidth = "1180px";
-                        context.screenHeight = "820px";
-                    }
-                    break;
-                case "mobile":
-                    if(screenOrientation == "landscape") {
-                        context.screenWidth = "390px";
-                        context.screenHeight = "850px";
-                    }else {
-                        context.screenWidth = "850px";
-                        context.screenHeight = "390px";
-                    }
-                    break;
+            if(screenOrientation == "portrait") {
+                screenHeight = "calc(100vw - 10rem)";
+                screenWidth = "calc(100vh - 12rem)";
             }
-        }
+            let screenType = context.screenType || "laptop";
+            if(screenType) {
+                switch(screenType) {
+                    case "largeScreen": 
+                        if(screenOrientation == "landscape") {
+                            context.screenWidth = "3840px";
+                            context.screenHeight = "2160px";
+                        }else {
+                            context.screenWidth = "2160px";
+                            context.screenHeight = "3840px";
+                        }
+                        break;
+                    case "desktop":
+                        if(screenOrientation == "landscape") {
+                            context.screenWidth = "1920px";
+                            context.screenHeight = "1080px";
+                        }else {
+                            context.screenWidth = "1080px";
+                            context.screenHeight = "1920px";
+                        }
+                        break;
+                    case "laptop": 
+                        if(screenOrientation == "landscape") {
+                            context.screenWidth = "1366px";
+                            context.screenHeight = "768px";
+                        }else {
+                            context.screenWidth = "768px";
+                            context.screenHeight = "1366px";
+                        }
+                        break;
+                    case "tablet": 
+                        if(screenOrientation == "landscape") {
+                            context.screenWidth = "820px";
+                            context.screenHeight = "1180px";
+                        }else {
+                            context.screenWidth = "1180px";
+                            context.screenHeight = "820px";
+                        }
+                        break;
+                    case "mobile":
+                        if(screenOrientation == "landscape") {
+                            context.screenWidth = "390px";
+                            context.screenHeight = "850px";
+                        }else {
+                            context.screenWidth = "850px";
+                            context.screenHeight = "390px";
+                        }
+                        break;
+                }
+            }
 
-        return {context};
+            return {context};
+        }
     })`;
 
     let pageContents = [
@@ -520,6 +735,28 @@ export const getPageDetails = async () => {
                             "props": {
                                 "icon": "Html"
                             }
+                        },
+                        {
+                            "name": "Undo",
+                            "elementId": "Undo",
+                            "tag": "mui-icon-button",
+                            "props": {
+                                "icon": "Undo"
+                            },
+                            "overrides": {
+                                "disabled": "[[api.helper.undoDisabled(api)]]"
+                            }
+                        },
+                        {
+                            "name": "Redo",
+                            "elementId": "Redo",
+                            "tag": "mui-icon-button",
+                            "props": {
+                                "icon": "Redo"
+                            },
+                            "overrides": {
+                                "disabled": "[[api.helper.redoDisabled(api)]]"
+                            }
                         }
                     ]
                 },
@@ -575,7 +812,7 @@ export const getPageDetails = async () => {
                                                     "width": "47vw"
                                                 },
                                                 "overrides": {
-                                                    "value": "[[api.context.pageData.contents]]",
+                                                    "value": "[[api.helper.getPageDataContents(api)]]",
                                                     "width": "[[api.context.leftContainerWidth]]"
                                                 },
                                                 "children": []
@@ -849,6 +1086,20 @@ export const getPageDetails = async () => {
                         "stopPropagation": true
                     },
                     {
+                        "name": "Undo",
+                        "eventName": "IconButton#clicked",
+                        "type": "script",
+                        "script": undoClicked,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "Redo",
+                        "eventName": "IconButton#clicked",
+                        "type": "script",
+                        "script": redoClicked,
+                        "stopPropagation": true
+                    },
+                    {
                         "name": "onNewFunctionBtnClicked",
                         "eventName": "IconButton#clicked",
                         "type": "script",
@@ -891,6 +1142,13 @@ export const getPageDetails = async () => {
                         "stopPropagation": true
                     },
                     {
+                        "name": "onComponentRemoveApplyClicked",
+                        "eventName": "IconButton#clicked",
+                        "type": "script",
+                        "script": onComponentRemoveApplyClicked,
+                        "stopPropagation": true
+                    },
+                    {
                         "name": "onAddFunctionModalClosed",
                         "eventName": "MODAL_CLOSED",
                         "type": "script",
@@ -923,10 +1181,31 @@ export const getPageDetails = async () => {
                         "stopPropagation": true
                     },
                     {
-                        "name": "ComponentSettingsModalClosed",
+                        "name": "ComponentAddModalClosed",
                         "eventName": "MODAL_CLOSED",
                         "type": "script",
                         "script": onComponentAddModalClosed,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "ComponentRemoveModalClosed",
+                        "eventName": "MODAL_CLOSED",
+                        "type": "script",
+                        "script": onComponentRemoveModalClosed,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "ComponentSettingsModalClosed",
+                        "eventName": "MODAL_CLOSED",
+                        "type": "script",
+                        "script": onComponentSettingsModalClosed,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "ComponentAddBlockModalClosed",
+                        "eventName": "MODAL_CLOSED",
+                        "type": "script",
+                        "script": onComponentAddBlockModalClosed,
                         "stopPropagation": true
                     },
                     {
@@ -937,10 +1216,31 @@ export const getPageDetails = async () => {
                         "stopPropagation": true
                     }, 
                     {
-                        "name": "AddComponentClicked",
+                        "name": "ComponentAddClicked",
                         "eventName": "DESIGNTIME_ADD_CLICKED",
                         "type": "script",
-                        "script": onAddComponentClicked,
+                        "script": onComponentAddClicked,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "ComponentSettingsClicked",
+                        "eventName": "DESIGNTIME_SETTINGS_CLICKED",
+                        "type": "script",
+                        "script": onComponentSettingsClicked,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "ComponentRemoveClicked",
+                        "eventName": "DESIGNTIME_REMOVE_CLICKED",
+                        "type": "script",
+                        "script": onComponentRemoveClicked,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "ComponentSettingsClicked",
+                        "eventName": "DESIGNTIME_ADDBLOCK_CLICKED",
+                        "type": "script",
+                        "script": onComponentAddBlockClicked,
                         "stopPropagation": true
                     }
                 ]
@@ -1018,7 +1318,8 @@ export const getPageDetails = async () => {
                                 "tag": "srs-relay",
                                 "props": {
                                     "relaylist": [{
-                                        "source": "IconButton#clicked",
+                                        "source_event": "IconButton#clicked",
+                                        "source_element": "modalCancelBtn",
                                         "target": "MODAL_CLOSED"
                                     }]
                                 },
@@ -1115,7 +1416,8 @@ export const getPageDetails = async () => {
                                 "tag": "srs-relay",
                                 "props": {
                                     "relaylist": [{
-                                        "source": "IconButton#clicked",
+                                        "source_event": "IconButton#clicked",
+                                        "source_element": "removeFnModalCancelBtn",
                                         "target": "MODAL_CLOSED"
                                     }]
                                 },
@@ -1213,7 +1515,8 @@ export const getPageDetails = async () => {
                                 "tag": "srs-relay",
                                 "props": {
                                     "relaylist": [{
-                                        "source": "IconButton#clicked",
+                                        "source_event": "IconButton#clicked",
+                                        "source_element": "editFnModalCancelBtn",
                                         "target": "MODAL_CLOSED"
                                     }]
                                 },
@@ -1299,7 +1602,8 @@ export const getPageDetails = async () => {
                             "tag": "srs-relay",
                             "props": {
                                 "relaylist": [{
-                                    "source": "IconButton#clicked",
+                                    "source_event": "IconButton#clicked",
+                                    "source_element": "previewModalCancelBtn",
                                     "target": "MODAL_CLOSED"
                                 }]
                             },
@@ -1421,6 +1725,97 @@ export const getPageDetails = async () => {
             ]
         },
         {
+            "name": "showEmbeddedCodeModal",
+            "elementId": "showEmbeddedCodeModal",
+            "tag": "mui-modal",
+            "props": {
+                "open": false
+            },
+            "overrides": {
+                "open": "[[api.context.showEmbeddedCodeModal]]"
+            },
+            "children": [
+                {
+                    "name": "showEmbeddedCodeContents",
+                    "elementId": "showEmbeddedCodeContents",
+                    "tag": "mui-box",
+                    "props": {
+                        "sx": {
+                            "position": "absolute",
+                            "top": "3%",
+                            "left": "2%",
+                            "transform": "translate(0%, 0%)",
+                            "width": "calc(100vw - 4%)",
+                            "height": "calc(100vh - 6%)",
+                            "bgcolor": "background.paper",
+                            "border": "2px solid #000",
+                            "boxShadow": 24,
+                            "overflow": "auto",
+                            "p": 4
+                        }
+                    },
+                    "children": [{
+                        "name": "showEmbeddedCodeTitleContainer",
+                        "elementId": "showEmbeddedCodeTitleContainer",
+                        "tag": "srs-container",
+                        "props": {
+                            "styles": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "alignItems": "stretch",
+                                "flexDirection": "row",
+                                "justifyContent": "space-between",
+                                "position": "sticky"
+                            }
+                        },
+                        "children": [{
+                            "name": "showEmbeddedCodeTitle",
+                            "elementId": "showEmbeddedCodeTitle",
+                            "tag": "mui-typography",
+                            "props": {
+                                "text": "Embedded Code",
+                                "color": "var(--cds-text-secondary)",
+                                "variant": "h5"
+                            }
+                        }, {
+                            "name": "showEmbeddedCodeModalCancelBtnContainer",
+                            "elementId": "showEmbeddedCodeModalCancelBtnContainer",
+                            "tag": "srs-relay",
+                            "props": {
+                                "relaylist": [{
+                                    "source_event": "IconButton#clicked",
+                                    "source_element": "showEmbeddedCodeModalCancelBtn",
+                                    "target": "MODAL_CLOSED"
+                                }]
+                            },
+                            "children": [
+                                {
+                                    "name": "showEmbeddedCodeModalCancelBtn",
+                                    "elementId": "showEmbeddedCodeModalCancelBtn",
+                                    "tag": "mui-icon-button",
+                                    "props": {
+                                        "icon": "Clear"
+                                    }
+                                }
+                            ]
+                        }]
+                    }, {
+                        "name": "showEmbeddedCodeContentEditor",
+                        "elementId": "showEmbeddedCodeContentEditor",
+                        "tag": "srs-codeeditor",
+                        "props": {
+                            "height": "calc(100vh - 20rem)",
+                            "width": "90vw"
+                        },
+                        "overrides": {
+                            "value": "[[api.helper.getEmbeddedCode(api)]]"
+                        },
+                        "children": []
+                    }]
+                }
+            ]
+        },
+        {
             "name": "componentSettingsModalContainer",
             "elementId": "componentSettingsModalContainer",
             "tag": "mui-modal",
@@ -1428,7 +1823,7 @@ export const getPageDetails = async () => {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.componentAddOpenModal]]"
+                "open": "[[api.context.componentSettingsOpenModal]]"
             },
             "children": [
                 {
@@ -1477,7 +1872,8 @@ export const getPageDetails = async () => {
                             "tag": "srs-relay",
                             "props": {
                                 "relaylist": [{
-                                    "source": "IconButton#clicked",
+                                    "source_event": "IconButton#clicked",
+                                    "source_element": "componentSettingsModalCancelBtn",
                                     "target": "MODAL_CLOSED"
                                 }]
                             },
@@ -1558,6 +1954,14 @@ export const getPageDetails = async () => {
                                                             "text": "Component Properties",
                                                             "color": "var(--cds-text-secondary)"
                                                         }
+                                                    },
+                                                    {
+                                                        "name": "compSettings",
+                                                        "elementId": "compSettings",
+                                                        "tag": "srs-builder-componentsettings",
+                                                        "props": {
+                                                            
+                                                        }
                                                     }
                                                 ]
                                             },
@@ -1635,19 +2039,117 @@ export const getPageDetails = async () => {
             ]
         },
         {
-            "name": "showEmbeddedCodeModal",
-            "elementId": "showEmbeddedCodeModal",
+            "name": "componentRemoveModalContainer",
+            "elementId": "componentRemoveModalContainer",
             "tag": "mui-modal",
             "props": {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.showEmbeddedCodeModal]]"
+                "open": "[[api.context.componentRemoveOpenModal]]"
             },
             "children": [
                 {
-                    "name": "showEmbeddedCodeContents",
-                    "elementId": "showEmbeddedCodeContents",
+                    "name": "removeComponentModalContents",
+                    "elementId": "removeComponentModalContents",
+                    "tag": "mui-box",
+                    "props": {
+                        "sx": {
+                            "position": "absolute",
+                            "top": "50%",
+                            "left": "50%",
+                            "transform": "translate(-50%, -50%)",
+                            "width": 400,
+                            "bgcolor": "background.paper",
+                            "border": "2px solid #000",
+                            "boxShadow": 24,
+                            "p": 4
+                        }
+                    },
+                    "children": [{
+                        "name": "removeComponentModalTitle",
+                        "elementId": "removeComponentModalTitle",
+                        "tag": "mui-typography",
+                        "props": {
+                            "text": "Delete Confirmation",
+                            "color": "var(--cds-text-secondary)",
+                            "variant": "h5"
+                        },
+                        "overrides": {
+                            "value": "[[api.context.tempFunctionName]]"
+                        }
+                    },{
+                            "name": "removeComponentNameField",
+                            "elementId": "removeComponentNameField",
+                            "tag": "mui-typography",
+                            "props": {
+                                "text": "Are you sure you want to delete the component",
+                                "color": "var(--cds-text-secondary)"
+                            },
+                            "overrides": {
+                                "text": "[[api.helper.getDeleteElementConfirmText(api)]]"
+                            }
+                        },
+                        {
+                            "name": "removeComponentModalActions",
+                            "elementId": "removeComponentModalActions",
+                            "tag": "mui-box",
+                            "props": {
+                                "sx": {
+                                    "display": "flex",
+                                    "flexDirection": "row",
+                                    "justifyContent": "flex-end",
+                                    "width": "100%"
+                                }
+                            },
+                            "children": [{
+                                "name": "removeComponentModalCancelBtnContainer",
+                                "elementId": "removeComponentModalCancelBtnContainer",
+                                "tag": "srs-relay",
+                                "props": {
+                                    "relaylist": [{
+                                        "source_event": "IconButton#clicked",
+                                        "source_element": "componentRemoveModalCancelBtn",
+                                        "target": "MODAL_CLOSED"
+                                    }]
+                                },
+                                "children": [
+                                    {
+                                        "name": "componentRemoveModalCancelBtn",
+                                        "elementId": "componentRemoveModalCancelBtn",
+                                        "tag": "mui-icon-button",
+                                        "props": {
+                                            "icon": "Clear"
+                                        }
+                                    }
+                                ]
+                            }, {
+                                "name": "componentRemoveModalApplyBtn",
+                                "elementId": "componentRemoveModalApplyBtn",
+                                "tag": "mui-icon-button",
+                                "props": {
+                                    "icon": "Check"
+                                }
+                            }]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "componentAddModalContainer",
+            "elementId": "componentAddModalContainer",
+            "tag": "mui-modal",
+            "props": {
+                "open": false
+            },
+            "overrides": {
+                "open": "[[api.context.componentAddOpenModal]]"
+            },
+            "children": [
+                {
+                    "name": "componentAddModalContents",
+                    "elementId": "componentAddModalContents",
                     "tag": "mui-box",
                     "props": {
                         "sx": {
@@ -1660,13 +2162,12 @@ export const getPageDetails = async () => {
                             "bgcolor": "background.paper",
                             "border": "2px solid #000",
                             "boxShadow": 24,
-                            "overflow": "auto",
                             "p": 4
                         }
                     },
                     "children": [{
-                        "name": "showEmbeddedCodeTitleContainer",
-                        "elementId": "showEmbeddedCodeTitleContainer",
+                        "name": "componentAddTitleContainer",
+                        "elementId": "componentAddTitleContainer",
                         "tag": "srs-container",
                         "props": {
                             "styles": {
@@ -1674,33 +2175,33 @@ export const getPageDetails = async () => {
                                 "flexDirection": "row",
                                 "alignItems": "stretch",
                                 "flexDirection": "row",
-                                "justifyContent": "space-between",
-                                "position": "sticky"
+                                "justifyContent": "space-between"
                             }
                         },
                         "children": [{
-                            "name": "showEmbeddedCodeTitle",
-                            "elementId": "showEmbeddedCodeTitle",
+                            "name": "componentAddTitle",
+                            "elementId": "componentAddTitle",
                             "tag": "mui-typography",
                             "props": {
-                                "text": "Embedded Code",
+                                "text": "Component Properties",
                                 "color": "var(--cds-text-secondary)",
                                 "variant": "h5"
                             }
                         }, {
-                            "name": "showEmbeddedCodeModalCancelBtnContainer",
-                            "elementId": "showEmbeddedCodeModalCancelBtnContainer",
+                            "name": "componentAddModalCancelBtnContainer",
+                            "elementId": "componentAddModalCancelBtnContainer",
                             "tag": "srs-relay",
                             "props": {
                                 "relaylist": [{
-                                    "source": "IconButton#clicked",
+                                    "source_event": "IconButton#clicked",
+                                    "source_element": "componentAddModalCancelBtn",
                                     "target": "MODAL_CLOSED"
                                 }]
                             },
                             "children": [
                                 {
-                                    "name": "showEmbeddedCodeModalCancelBtn",
-                                    "elementId": "showEmbeddedCodeModalCancelBtn",
+                                    "name": "componentAddModalCancelBtn",
+                                    "elementId": "componentAddModalCancelBtn",
                                     "tag": "mui-icon-button",
                                     "props": {
                                         "icon": "Clear"
@@ -1708,18 +2209,375 @@ export const getPageDetails = async () => {
                                 }
                             ]
                         }]
-                    }, {
-                        "name": "showEmbeddedCodeContentEditor",
-                        "elementId": "showEmbeddedCodeContentEditor",
-                        "tag": "srs-codeeditor",
+                    }, 
+                    {
+                        "name": "componentAddContentContainer",
+                        "elementId": "componentAddContentContainer",
+                        "tag": "mui-grid",
                         "props": {
-                            "height": "calc(100vh - 20rem)",
-                            "width": "90vw"
+                            "container": true
                         },
-                        "overrides": {
-                            "value": "[[api.helper.getEmbeddedCode(api)]]"
+                        "children": [
+                            {
+                                "name": "componentAddContents",
+                                "elementId": "componentAddContents",
+                                "tag": "mui-grid",
+                                "props": {
+                                    "item": true, 
+                                    "md": 6
+                                },
+                                "children": [
+                                    {
+                                        "name": "componentAddContentsTabs",
+                                        "elementId": "componentAddContentsTabs",
+                                        "tag": "mui-tabs",
+                                        "props": {
+                                            "value": "properties",
+                                            "sx": {
+                                                "color": "var(--cds-background-inverse)"
+                                            }
+                                        },
+                                        "children": [
+                                            {
+                                                "name": "componentAddTemplateTab",
+                                                "elementId": "componentAddTemplateTab",
+                                                "tag": "mui-tab",
+                                                "props": {
+                                                    "label": "Content Template",
+                                                    "value": "Template"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "name": "componentAddTemplateTabContent",
+                                                        "elementId": "componentAddTemplateTabContent",
+                                                        "tag": "mui-typography",
+                                                        "props": {
+                                                            "text": "Content Template",
+                                                            "color": "var(--cds-text-secondary)"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "componentAddComponentPropsTab",
+                                                "elementId": "componentAddComponentPropsTab",
+                                                "tag": "mui-tab",
+                                                "props": {
+                                                    "label": "Properties",
+                                                    "value": "properties"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "name": "componentAddComponentPropsTabContent",
+                                                        "elementId": "componentAddComponentPropsTabContent",
+                                                        "tag": "mui-typography",
+                                                        "props": {
+                                                            "text": "Component Properties",
+                                                            "color": "var(--cds-text-secondary)"
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "compSettings",
+                                                        "elementId": "compSettings",
+                                                        "tag": "srs-builder-componentAdd",
+                                                        "props": {
+                                                            
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "componentAddComponentStylesTab",
+                                                "elementId": "componentAddComponentStylesTab",
+                                                "tag": "mui-tab",
+                                                "props": {
+                                                    "label": "Styles",
+                                                    "value": "styles"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "name": "componentAddComponentStylesTabContent",
+                                                        "elementId": "componentAddComponentStylesTabContent",
+                                                        "tag": "mui-typography",
+                                                        "props": {
+                                                            "text": "Component Styles",
+                                                            "color": "var(--cds-text-secondary)"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "componentPreviewContainer",
+                                "elementId": "componentPreviewContainer",
+                                "tag": "mui-grid",
+                                "props": {
+                                    "item": true, 
+                                    "md": 6
+                                },
+                                "children": [
+                                    {
+                                        "name": "componentPreviewContainer2",
+                                        "elementId": "componentPreviewContainer2",
+                                        "tag": "mui-box",
+                                        "props": {
+                                            "sx": {
+                                                "minHeight": "300px",
+                                                "height": "calc(100vh - 20rem)",
+                                                "maxHeight": "calc(100vh - 20rem)",
+                                                "overflow": "hidden",
+                                                "width": "50rem",
+                                                "position": "absolute",
+                                                "top": "20%"
+                                            }
+                                        },
+                                        "children": [
+                                            {
+                                                "name": "componentPreviewContentRenderer",
+                                                "tag": "srs-contentrenderer",
+                                                "props": {
+                                                    "styles": {
+                                                        "minHeight": "300px",
+                                                        "overflow": "auto"
+                                                    }
+                                                },
+                                                "overrides": {
+                                                    "overrides": "[[api.helper.getComponentContents(api)]]",
+                                                    "ts": "1683941616850"
+                                                },
+                                                "children": []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }]
+                }
+            ]
+        },
+        {
+            "name": "componentAddBlockModalContainer",
+            "elementId": "componentAddBlockModalContainer",
+            "tag": "mui-modal",
+            "props": {
+                "open": false
+            },
+            "overrides": {
+                "open": "[[api.context.componentAddBlockOpenModal]]"
+            },
+            "children": [
+                {
+                    "name": "componentAddBlockModalContents",
+                    "elementId": "componentAddBlockModalContents",
+                    "tag": "mui-box",
+                    "props": {
+                        "sx": {
+                            "position": "absolute",
+                            "top": "3%",
+                            "left": "2%",
+                            "transform": "translate(0%, 0%)",
+                            "width": "calc(100vw - 4%)",
+                            "height": "calc(100vh - 6%)",
+                            "bgcolor": "background.paper",
+                            "border": "2px solid #000",
+                            "boxShadow": 24,
+                            "p": 4
+                        }
+                    },
+                    "children": [{
+                        "name": "componentAddBlockTitleContainer",
+                        "elementId": "componentAddBlockTitleContainer",
+                        "tag": "srs-container",
+                        "props": {
+                            "styles": {
+                                "display": "flex",
+                                "flexDirection": "row",
+                                "alignItems": "stretch",
+                                "flexDirection": "row",
+                                "justifyContent": "space-between"
+                            }
                         },
-                        "children": []
+                        "children": [{
+                            "name": "componentAddBlockTitle",
+                            "elementId": "componentAddBlockTitle",
+                            "tag": "mui-typography",
+                            "props": {
+                                "text": "Component Properties",
+                                "color": "var(--cds-text-secondary)",
+                                "variant": "h5"
+                            }
+                        }, {
+                            "name": "componentAddBlockModalCancelBtnContainer",
+                            "elementId": "componentAddBlockModalCancelBtnContainer",
+                            "tag": "srs-relay",
+                            "props": {
+                                "relaylist": [{
+                                    "source_event": "IconButton#clicked",
+                                    "source_element": "componentAddBlockModalCancelBtn",
+                                    "target": "MODAL_CLOSED"
+                                }]
+                            },
+                            "children": [
+                                {
+                                    "name": "componentAddBlockModalCancelBtn",
+                                    "elementId": "componentAddBlockModalCancelBtn",
+                                    "tag": "mui-icon-button",
+                                    "props": {
+                                        "icon": "Clear"
+                                    }
+                                }
+                            ]
+                        }]
+                    }, 
+                    {
+                        "name": "componentAddBlockContentContainer",
+                        "elementId": "componentAddBlockContentContainer",
+                        "tag": "mui-grid",
+                        "props": {
+                            "container": true
+                        },
+                        "children": [
+                            {
+                                "name": "componentAddBlockContents",
+                                "elementId": "componentAddBlockContents",
+                                "tag": "mui-grid",
+                                "props": {
+                                    "item": true, 
+                                    "md": 6
+                                },
+                                "children": [
+                                    {
+                                        "name": "componentAddBlockContentsTabs",
+                                        "elementId": "componentAddBlockContentsTabs",
+                                        "tag": "mui-tabs",
+                                        "props": {
+                                            "value": "properties",
+                                            "sx": {
+                                                "color": "var(--cds-background-inverse)"
+                                            }
+                                        },
+                                        "children": [
+                                            {
+                                                "name": "componentAddBlockTemplateTab",
+                                                "elementId": "componentAddBlockTemplateTab",
+                                                "tag": "mui-tab",
+                                                "props": {
+                                                    "label": "Content Template",
+                                                    "value": "Template"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "name": "componentAddBlockTemplateTabContent",
+                                                        "elementId": "componentAddBlockTemplateTabContent",
+                                                        "tag": "mui-typography",
+                                                        "props": {
+                                                            "text": "Content Template",
+                                                            "color": "var(--cds-text-secondary)"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "componentAddBlockComponentPropsTab",
+                                                "elementId": "componentAddBlockComponentPropsTab",
+                                                "tag": "mui-tab",
+                                                "props": {
+                                                    "label": "Properties",
+                                                    "value": "properties"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "name": "componentAddBlockComponentPropsTabContent",
+                                                        "elementId": "componentAddBlockComponentPropsTabContent",
+                                                        "tag": "mui-typography",
+                                                        "props": {
+                                                            "text": "Component Properties",
+                                                            "color": "var(--cds-text-secondary)"
+                                                        }
+                                                    },
+                                                    {
+                                                        "name": "compSettings",
+                                                        "elementId": "compSettings",
+                                                        "tag": "srs-builder-componentAddBlock",
+                                                        "props": {
+                                                            
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "name": "componentAddBlockComponentStylesTab",
+                                                "elementId": "componentAddBlockComponentStylesTab",
+                                                "tag": "mui-tab",
+                                                "props": {
+                                                    "label": "Styles",
+                                                    "value": "styles"
+                                                },
+                                                "children": [
+                                                    {
+                                                        "name": "componentAddBlockComponentStylesTabContent",
+                                                        "elementId": "componentAddBlockComponentStylesTabContent",
+                                                        "tag": "mui-typography",
+                                                        "props": {
+                                                            "text": "Component Styles",
+                                                            "color": "var(--cds-text-secondary)"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "componentPreviewContainer",
+                                "elementId": "componentPreviewContainer",
+                                "tag": "mui-grid",
+                                "props": {
+                                    "item": true, 
+                                    "md": 6
+                                },
+                                "children": [
+                                    {
+                                        "name": "componentPreviewContainer2",
+                                        "elementId": "componentPreviewContainer2",
+                                        "tag": "mui-box",
+                                        "props": {
+                                            "sx": {
+                                                "minHeight": "300px",
+                                                "height": "calc(100vh - 20rem)",
+                                                "maxHeight": "calc(100vh - 20rem)",
+                                                "overflow": "hidden",
+                                                "width": "50rem",
+                                                "position": "absolute",
+                                                "top": "20%"
+                                            }
+                                        },
+                                        "children": [
+                                            {
+                                                "name": "componentPreviewContentRenderer",
+                                                "tag": "srs-contentrenderer",
+                                                "props": {
+                                                    "styles": {
+                                                        "minHeight": "300px",
+                                                        "overflow": "auto"
+                                                    }
+                                                },
+                                                "overrides": {
+                                                    "overrides": "[[api.helper.getComponentContents(api)]]",
+                                                    "ts": "1683941616850"
+                                                },
+                                                "children": []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
                     }]
                 }
             ]
@@ -1730,16 +2588,28 @@ export const getPageDetails = async () => {
     let pageContext = {
         selectedFunctionName: "",
         selectedFunctionCode: "",
+        selectedComponentToRemove: "",
+        selectedComponentForAdd: "",
+        selectedComponentForAddBlock: "",
+        selectedComponentForSettings: "",
         tempFunctionName: "",
         addFunctionOpenModal: false,
         removeFunctionOpenModal: false,
         editFunctionOpenModal: false,
+        componentSettingsOpenModal: false,
         componentAddOpenModal: false,
+        componentRemoveOpenModal: false,
+        componentAddBlockOpenModal: false,
         openedModals: [],
+        contentHistory: [],
+        contentHistoryIndex: -1,
         previewPanelMode: 3,
         leftContainerColumns: 6,
         rightContainerColumns: 6,
         leftContainerWidth: "47vw",
+        screenType: "laptop",
+        screenWidth: "1366px",
+        screenHeight: "768px",
         pageData: {
             functions: {
                 "Item1": "(function() {})"
@@ -1755,6 +2625,13 @@ export const getPageDetails = async () => {
                 result = JSON.parse(result);
             }
             return {...result, designtime: true};
+        },
+        "getPageDataContents": function(api) {
+            let pageDataContents = api.context.pageData.contents || [];
+            if(typeof pageDataContents == "string") {
+                pageDataContents = JSON.parse(pageDataContents);
+            }
+            return JSON.stringify(pageDataContents, null, 4);
         },
         "getComponentContents": function(api) {
             return {
@@ -1785,6 +2662,9 @@ export const getPageDetails = async () => {
         }, 
         "getDeleteConfirmText": function(api) {
             return "Are you sure you want to delete the function " + (api.context?.selectedFunctionName || "");
+        },
+        "getDeleteElementConfirmText": function(api) {
+            return "Are you sure you want to delete element " + (api.context?.selectedComponentToRemove || "");
         },
         "getPreviewContentStyles": function(api) {
             
@@ -1856,6 +2736,13 @@ export const getPageDetails = async () => {
         },
         "getEmbeddedCode": function(api) {
             return api.context.embeddedCode;
+        },
+        "undoDisabled": function(api) {
+            return api.context.contentHistoryIndex < 0 || api.context.contentHistory.length <= 1;
+        },
+        "redoDisabled": function(api) {
+            debugger;
+            return !(api.context.contentHistoryIndex < api.context.contentHistory.length - 1);
         }
     };
     return {pageContents, pageContext, pageFunctions};
