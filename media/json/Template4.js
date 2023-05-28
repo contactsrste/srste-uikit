@@ -1,6 +1,7 @@
 export const data = [
     {
         "name": "card1",
+        "elementId": "card1",
         "tag": "mui-card",
         "props": {
             "sx": {
@@ -10,7 +11,8 @@ export const data = [
         },
         "children": [
             {
-                "name": "card-header",
+                "name": "card-header1",
+                "elementId": "card-header1",
                 "tag": "mui-card-header",
                 "props": {
                     "sx": "{p: 3}",
@@ -19,7 +21,8 @@ export const data = [
                 },
                 "children": [
                     {
-                        "name": "avatar",
+                        "name": "avatar1",
+                        "elementId": "avatar1",
                         "tag": "mui-avatar",
                         "props": {
                             "sx": "{bgcolor: purple[500], width: 50, height: 50}",
@@ -29,21 +32,24 @@ export const data = [
                         }
                     },
                     {
-                        "name": "actions-container",
+                        "name": "actions-container1",
+                        "elementId": "actions-container1",
                         "tag": "srs-container",
                         "props": {
                             "slotname": "action"
                         },
                         "children": [
                             {
-                                "name": "open-button",
+                                "name": "open-button1",
+                                "elementId": "open-button1",
                                 "tag": "mui-button",
                                 "props": {
                                     "label": "settings"
                                 },
                                 "children": [
                                     {
-                                        "name": "typography",
+                                        "name": "typography1",
+                                        "elementId": "typography1",
                                         "tag": "mui-typography",
                                         "props": {
                                             "variant": "body1",
@@ -59,14 +65,16 @@ export const data = [
                 ]
             },
             {
-                "name": "card-content",
+                "name": "card-content2",
+                "elementId": "card-content2",
                 "tag": "mui-card-content",
                 "props": {
                     "sx": "{p: 3}"
                 },
                 "children": [
                     {
-                        "name": "typography",
+                        "name": "typography2",
+                        "elementId": "typography2",
                         "tag": "mui-typography",
                         "props": {
                             "variant": "body1",
@@ -76,7 +84,8 @@ export const data = [
                         }
                     },
                     {
-                        "name": "button",
+                        "name": "button2",
+                        "elementId": "button2",
                         "tag": "mui-button",
                         "props": {
                             "variant": "body1",
@@ -84,7 +93,8 @@ export const data = [
                         },
                         "children": [
                             {
-                                "name": "typography",
+                                "name": "typography3",
+                                "elementId": "typography3",
                                 "tag": "mui-typography",
                                 "props": {
                                     "variant": "body1",
