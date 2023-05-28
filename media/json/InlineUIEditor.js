@@ -38,6 +38,9 @@ export const getPageDetails = async () => {
             ctx.pageData = ctx.pageData || {};        
             ctx.pageData.contents = codeEditorValue || [];
             return {context: ctx};
+        }else if(elementId == "editBlockEditor") {
+            ctx.editBlockCode = codeEditorValue || {};
+            return {context: ctx};
         }    
         
     })`;
@@ -374,10 +377,10 @@ export const getPageDetails = async () => {
         } 
         
     })`;
-    let onComponentAddBlockModalClosed = `(async function() {  
+    let onComponentEditBlockModalClosed = `(async function() {  
           
-        if(eventPayload?.payload?.id == "componentAddBlockModalCancelBtn") { 
-            context.componentAddBlockOpenModal = false;
+        if(eventPayload?.payload?.id == "componentEditBlockModalCancelBtn") { 
+            context.componentEditBlockOpenModal = false;
             let currentModal = context.openedModals.pop();
             if(currentModal) {
                 context[currentModal] = false;
@@ -387,11 +390,68 @@ export const getPageDetails = async () => {
                 context[previousModal] = true;
                 context.openedModals.push(previousModal);
             }
-            context.selectedComponentForAddBlock = "";
+            context.selectedComponentForEditBlock = "";
             return {context}
         } 
         
     })`;
+
+    let onEditBlockApplyBtnClicked = `(async function() {  
+        if(eventPayload?.payload?.id == "EditBlockApply") { 
+            debugger;
+
+            let contentItems = context.pageData.contents;
+            contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
+            let elementToUpdate = api.findElement(context.selectedComponentForEditBlock, contentItems);
+            
+            function findAndReplace(tree, targetName, replacement) {
+                return tree.map(node => {
+                  if (node.elementId === targetName) {
+                    return replacement; // Replace the target node with the replacement subtree
+                  } else if (node.children && node.children.length > 0) {
+                    // Recursively search for the target node in the children
+                    const newChildren = findAndReplace(node.children, targetName, replacement);
+                    return { ...node, children: newChildren };
+                  }
+                  return node; // No replacement needed for this node
+                });
+            }
+
+            let editBlockCode = context.editBlockCode;
+            if(typeof editBlockCode == "string") {
+                editBlockCode = JSON.parse(editBlockCode);
+            }
+            const updatedContentItems = findAndReplace(contentItems, context.selectedComponentForEditBlock, editBlockCode);
+
+            context.pageData.contents = updatedContentItems;
+            let previewData = context.previewData || {};
+            if(typeof previewData == "string") {
+                previewData = JSON.parse(previewData);
+                previewData.contents = updatedContentItems;
+            }else {
+                previewData.contents = updatedContentItems;
+            }
+            context.previewData = previewData;
+
+            context.contentHistory.push(JSON.parse(JSON.stringify(updatedContentItems)));
+            context.contentHistoryIndex = context.contentHistoryIndex + 1;
+            
+            context.componentEditBlockOpenModal = false;
+            let currentModal = context.openedModals.pop();
+            if(currentModal) {
+                context[currentModal] = false;
+            }
+            let previousModal = context.openedModals.pop();
+            if(previousModal) {
+                context[previousModal] = true;
+                context.openedModals.push(previousModal);
+            }
+            context.selectedComponentForEditBlock = "";
+            return {context}
+        } 
+        
+    })`;
+
     let onFunctionNameChanged = `(async function() {    
         let elementId = eventPayload?.payload?.id || "";    
         if(elementId == "functionNameField" || elementId == "editFunctionNameField") { 
@@ -504,19 +564,27 @@ export const getPageDetails = async () => {
         return {context}
     })`;
 
-    let onComponentAddBlockClicked = `(async function() {    
+    let onComponentEditBlockClicked = `(async function() {    
         
         let elementId = eventPayload?.payload?.id || "";    
-        console.log("in onComponentAddBlockClicked", elementId);
-        context.selectedComponentForAddBlock = elementId;
-        context.componentAddBlockOpenModal = true;
+        console.log("in onComponentEditBlockClicked", elementId);
+        context.selectedComponentForEditBlock = elementId;
+
+        let pageDataContents = context.pageData.contents || [];
+        if(typeof pageDataContents == "string") {
+            pageDataContents = JSON.parse(pageDataContents);
+        }
+        let matchingElement = api.findElement(context.selectedComponentForEditBlock, pageDataContents);
+        context.editBlockCode = matchingElement || {};
+
+        context.componentEditBlockOpenModal = true;
         context.openedModals = context.openedModals || [];
         let currentModal = context.openedModals.pop();
         if(currentModal) {
             context[currentModal] = false;
             context.openedModals.push(currentModal);
         }
-        context.openedModals.push("componentAddBlockOpenModal");
+        context.openedModals.push("componentEditBlockOpenModal");
         return {context}
     })`;
 
@@ -1149,6 +1217,13 @@ export const getPageDetails = async () => {
                         "stopPropagation": true
                     },
                     {
+                        "name": "onEditBlockApplyBtnClicked",
+                        "eventName": "IconButton#clicked",
+                        "type": "script",
+                        "script": onEditBlockApplyBtnClicked,
+                        "stopPropagation": true
+                    },
+                    {
                         "name": "onAddFunctionModalClosed",
                         "eventName": "MODAL_CLOSED",
                         "type": "script",
@@ -1202,10 +1277,10 @@ export const getPageDetails = async () => {
                         "stopPropagation": true
                     },
                     {
-                        "name": "ComponentAddBlockModalClosed",
+                        "name": "ComponentEditBlockModalClosed",
                         "eventName": "MODAL_CLOSED",
                         "type": "script",
-                        "script": onComponentAddBlockModalClosed,
+                        "script": onComponentEditBlockModalClosed,
                         "stopPropagation": true
                     },
                     {
@@ -1240,7 +1315,7 @@ export const getPageDetails = async () => {
                         "name": "ComponentSettingsClicked",
                         "eventName": "DESIGNTIME_ADDBLOCK_CLICKED",
                         "type": "script",
-                        "script": onComponentAddBlockClicked,
+                        "script": onComponentEditBlockClicked,
                         "stopPropagation": true
                     }
                 ]
@@ -2020,6 +2095,8 @@ export const getPageDetails = async () => {
                                                 "props": {
                                                     "styles": {
                                                         "minHeight": "300px",
+                                                        "height": "calc(100vh - 20rem)",
+                                                        "maxHeight": "calc(100vh - 20rem)",
                                                         "overflow": "auto"
                                                     }
                                                 },
@@ -2360,19 +2437,19 @@ export const getPageDetails = async () => {
             ]
         },
         {
-            "name": "componentAddBlockModalContainer",
-            "elementId": "componentAddBlockModalContainer",
+            "name": "componentEditBlockModalContainer",
+            "elementId": "componentEditBlockModalContainer",
             "tag": "mui-modal",
             "props": {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.componentAddBlockOpenModal]]"
+                "open": "[[api.context.componentEditBlockOpenModal]]"
             },
             "children": [
                 {
-                    "name": "componentAddBlockModalContents",
-                    "elementId": "componentAddBlockModalContents",
+                    "name": "componentEditBlockModalContents",
+                    "elementId": "componentEditBlockModalContents",
                     "tag": "mui-box",
                     "props": {
                         "sx": {
@@ -2389,8 +2466,8 @@ export const getPageDetails = async () => {
                         }
                     },
                     "children": [{
-                        "name": "componentAddBlockTitleContainer",
-                        "elementId": "componentAddBlockTitleContainer",
+                        "name": "componentEditBlockTitleContainer",
+                        "elementId": "componentEditBlockTitleContainer",
                         "tag": "srs-container",
                         "props": {
                             "styles": {
@@ -2402,29 +2479,29 @@ export const getPageDetails = async () => {
                             }
                         },
                         "children": [{
-                            "name": "componentAddBlockTitle",
-                            "elementId": "componentAddBlockTitle",
+                            "name": "componentEditBlockTitle",
+                            "elementId": "componentEditBlockTitle",
                             "tag": "mui-typography",
                             "props": {
-                                "text": "Component Properties",
+                                "text": "Add Template",
                                 "color": "var(--cds-text-secondary)",
                                 "variant": "h5"
                             }
                         }, {
-                            "name": "componentAddBlockModalCancelBtnContainer",
-                            "elementId": "componentAddBlockModalCancelBtnContainer",
+                            "name": "componentEditBlockModalCancelBtnContainer",
+                            "elementId": "componentEditBlockModalCancelBtnContainer",
                             "tag": "srs-relay",
                             "props": {
                                 "relaylist": [{
                                     "source_event": "IconButton#clicked",
-                                    "source_element": "componentAddBlockModalCancelBtn",
+                                    "source_element": "componentEditBlockModalCancelBtn",
                                     "target": "MODAL_CLOSED"
                                 }]
                             },
                             "children": [
                                 {
-                                    "name": "componentAddBlockModalCancelBtn",
-                                    "elementId": "componentAddBlockModalCancelBtn",
+                                    "name": "componentEditBlockModalCancelBtn",
+                                    "elementId": "componentEditBlockModalCancelBtn",
                                     "tag": "mui-icon-button",
                                     "props": {
                                         "icon": "Clear"
@@ -2434,108 +2511,57 @@ export const getPageDetails = async () => {
                         }]
                     }, 
                     {
-                        "name": "componentAddBlockContentContainer",
-                        "elementId": "componentAddBlockContentContainer",
+                        "name": "componentEditBlockContentContainer",
+                        "elementId": "componentEditBlockContentContainer",
                         "tag": "mui-grid",
                         "props": {
                             "container": true
                         },
                         "children": [
                             {
-                                "name": "componentAddBlockContents",
-                                "elementId": "componentAddBlockContents",
+                                "name": "EditBlockActionContainer1",
+                                "elementId": "EditBlockActionContainer1",
                                 "tag": "mui-grid",
                                 "props": {
-                                    "item": true, 
-                                    "md": 6
+                                    "item": true,
+                                    "md": 12
                                 },
                                 "children": [
                                     {
-                                        "name": "componentAddBlockContentsTabs",
-                                        "elementId": "componentAddBlockContentsTabs",
-                                        "tag": "mui-tabs",
+                                        "name": "EditBlockActionContainer2",
+                                        "elementId": "EditBlockActionContainer2",
+                                        "tag": "mui-box",
                                         "props": {
-                                            "value": "properties",
                                             "sx": {
-                                                "color": "var(--cds-background-inverse)"
+                                                "display": "flex",
+                                                "flexDirection": "row",
+                                                "marginLeft": "95%"
                                             }
                                         },
                                         "children": [
                                             {
-                                                "name": "componentAddBlockTemplateTab",
-                                                "elementId": "componentAddBlockTemplateTab",
-                                                "tag": "mui-tab",
+                                                "name": "EditBlockUpdatePreview",
+                                                "elementId": "EditBlockUpdatePreview",
+                                                "tag": "mui-icon-button",
                                                 "props": {
-                                                    "label": "Content Template",
-                                                    "value": "Template"
-                                                },
-                                                "children": [
-                                                    {
-                                                        "name": "componentAddBlockTemplateTabContent",
-                                                        "elementId": "componentAddBlockTemplateTabContent",
-                                                        "tag": "mui-typography",
-                                                        "props": {
-                                                            "text": "Content Template",
-                                                            "color": "var(--cds-text-secondary)"
-                                                        }
-                                                    }
-                                                ]
+                                                    "icon": "PlayArrow"
+                                                }
                                             },
                                             {
-                                                "name": "componentAddBlockComponentPropsTab",
-                                                "elementId": "componentAddBlockComponentPropsTab",
-                                                "tag": "mui-tab",
+                                                "name": "EditBlockApply",
+                                                "elementId": "EditBlockApply",
+                                                "tag": "mui-icon-button",
                                                 "props": {
-                                                    "label": "Properties",
-                                                    "value": "properties"
-                                                },
-                                                "children": [
-                                                    {
-                                                        "name": "componentAddBlockComponentPropsTabContent",
-                                                        "elementId": "componentAddBlockComponentPropsTabContent",
-                                                        "tag": "mui-typography",
-                                                        "props": {
-                                                            "text": "Component Properties",
-                                                            "color": "var(--cds-text-secondary)"
-                                                        }
-                                                    },
-                                                    {
-                                                        "name": "compSettings",
-                                                        "elementId": "compSettings",
-                                                        "tag": "srs-builder-componentAddBlock",
-                                                        "props": {
-                                                            
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "name": "componentAddBlockComponentStylesTab",
-                                                "elementId": "componentAddBlockComponentStylesTab",
-                                                "tag": "mui-tab",
-                                                "props": {
-                                                    "label": "Styles",
-                                                    "value": "styles"
-                                                },
-                                                "children": [
-                                                    {
-                                                        "name": "componentAddBlockComponentStylesTabContent",
-                                                        "elementId": "componentAddBlockComponentStylesTabContent",
-                                                        "tag": "mui-typography",
-                                                        "props": {
-                                                            "text": "Component Styles",
-                                                            "color": "var(--cds-text-secondary)"
-                                                        }
-                                                    }
-                                                ]
+                                                    "icon": "DoneAll"
+                                                }
                                             }
                                         ]
                                     }
                                 ]
                             },
                             {
-                                "name": "componentPreviewContainer",
-                                "elementId": "componentPreviewContainer",
+                                "name": "componentEditBlockContents",
+                                "elementId": "componentEditBlockContents",
                                 "tag": "mui-grid",
                                 "props": {
                                     "item": true, 
@@ -2543,8 +2569,8 @@ export const getPageDetails = async () => {
                                 },
                                 "children": [
                                     {
-                                        "name": "componentPreviewContainer2",
-                                        "elementId": "componentPreviewContainer2",
+                                        "name": "componentEditBlockContainer2",
+                                        "elementId": "componentEditBlockContainer2",
                                         "tag": "mui-box",
                                         "props": {
                                             "sx": {
@@ -2552,23 +2578,68 @@ export const getPageDetails = async () => {
                                                 "height": "calc(100vh - 20rem)",
                                                 "maxHeight": "calc(100vh - 20rem)",
                                                 "overflow": "hidden",
-                                                "width": "50rem",
-                                                "position": "absolute",
+                                                "marginLeft": "10px",
+                                                "width": "calc(100% - 10px)"
+                                            }
+                                        },
+                                        "children": [
+                                            {
+                                                "name": "editBlockEditor",
+                                                "elementId": "editBlockEditor",
+                                                "tag": "srs-codeeditor",
+                                                "props": {
+                                                    "language": "html",
+                                                    "height": "calc(100vh - 20rem)",
+                                                    "width": "47vw"
+                                                },
+                                                "overrides": {
+                                                    "value": "[[api.helper.getBlockTemplateCode(api)]]"
+                                                },
+                                                "children": []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "componentEditBlockContainer",
+                                "elementId": "componentEditBlockContainer",
+                                "tag": "mui-grid",
+                                "props": {
+                                    "item": true, 
+                                    "md": 6
+                                },
+                                "children": [
+                                    {
+                                        "name": "componentEditBlockContainer2",
+                                        "elementId": "componentEditBlockContainer2",
+                                        "tag": "mui-box",
+                                        "props": {
+                                            "sx": {
+                                                "minHeight": "300px",
+                                                "height": "calc(100vh - 20rem)",
+                                                "maxHeight": "calc(100vh - 20rem)",
+                                                "overflow": "hidden",
+                                                "marginLeft": "10px",
+                                                "marginRight": "10px",
+                                                "width": "calc(100% - 20px)",
                                                 "top": "20%"
                                             }
                                         },
                                         "children": [
                                             {
-                                                "name": "componentPreviewContentRenderer",
+                                                "name": "componentEditBlockContentRenderer",
                                                 "tag": "srs-contentrenderer",
                                                 "props": {
                                                     "styles": {
                                                         "minHeight": "300px",
+                                                        "height": "calc(100vh - 20rem)",
+                                                        "maxHeight": "calc(100vh - 20rem)",
                                                         "overflow": "auto"
                                                     }
                                                 },
                                                 "overrides": {
-                                                    "overrides": "[[api.helper.getComponentContents(api)]]",
+                                                    "overrides": "[[api.helper.getComponentEditBlockContents(api)]]",
                                                     "ts": "1683941616850"
                                                 },
                                                 "children": []
@@ -2590,8 +2661,9 @@ export const getPageDetails = async () => {
         selectedFunctionCode: "",
         selectedComponentToRemove: "",
         selectedComponentForAdd: "",
-        selectedComponentForAddBlock: "",
+        selectedComponentForEditBlock: "",
         selectedComponentForSettings: "",
+        editBlockCode: {},
         tempFunctionName: "",
         addFunctionOpenModal: false,
         removeFunctionOpenModal: false,
@@ -2599,7 +2671,7 @@ export const getPageDetails = async () => {
         componentSettingsOpenModal: false,
         componentAddOpenModal: false,
         componentRemoveOpenModal: false,
-        componentAddBlockOpenModal: false,
+        componentEditBlockOpenModal: false,
         openedModals: [],
         contentHistory: [],
         contentHistoryIndex: -1,
@@ -2741,8 +2813,33 @@ export const getPageDetails = async () => {
             return api.context.contentHistoryIndex < 0 || api.context.contentHistory.length <= 1;
         },
         "redoDisabled": function(api) {
-            debugger;
             return !(api.context.contentHistoryIndex < api.context.contentHistory.length - 1);
+        },
+        "getBlockTemplateCode": function(api) {
+            let editBlockCode = api.context.editBlockCode || {};
+            if(typeof editBlockCode == "string") {
+                editBlockCode = JSON.parse(editBlockCode);
+            }
+            return JSON.stringify(editBlockCode|| {}, null, 4);
+        },
+        "getComponentEditBlockContents": function(api) {
+            debugger;
+
+            let editBlockCode = api.context.editBlockCode || {};
+            if(typeof editBlockCode == "string") {
+                editBlockCode = JSON.parse(editBlockCode);
+            }
+
+            let contents = [];
+            if(editBlockCode && Object.keys(editBlockCode).length > 0) {
+                contents = [editBlockCode];
+            }
+            return {
+                contents,
+                context: {},
+                functions: {},
+                designtime: false
+            };
         }
     };
     return {pageContents, pageContext, pageFunctions};
