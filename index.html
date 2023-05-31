@@ -64,10 +64,10 @@
         let editorData = await getPageDetails();
         if(editorData) {
             window.__SRS__ = window.__SRS__ || {};
-            window.__SRS__.contents = editorData.pageContents;
+            window.__SRS__.mode = "sandbox";
             window.__SRS__.context = editorData.pageContext;
             window.__SRS__.functions = editorData.pageFunctions;
-            window.__SRS__.mode = "sandbox";
+            window.__SRS__.contents = editorData.pageContents;
             dispatchEvent(new CustomEvent("GLOBAL_CONTENTS_UPDATED", {}));
         } 
     }
