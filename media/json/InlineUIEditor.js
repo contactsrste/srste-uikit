@@ -1,26 +1,32 @@
+import { getComponentSettingsData } from "../components/builder/GetComponentSettings";
+import { getComponentAddData } from "../components/builder/GetComponentAdd";
+
+const componentSettingsWidgetData = getComponentSettingsData();
+const componentAddWidgetData = getComponentAddData();
+
 export const getPageDetails = async () => {
     let onNewFnBtnClicked = `(async function() {
-        let elementId = eventPayload?.payload?.id || "";
+        let elementId = api.eventPayload?.payload?.id || "";
         if(elementId == "functionsNewBtn") { 
-            context.addFunctionOpenModal = true;
-            return {context};
+            api.context.addFunctionOpenModal = true;
+            return {context: api.context};
         }else if(elementId == "modalApplyBtn") { 
-            context.addFunctionOpenModal = false; 
-            context.pageData = context.pageData || {}; 
-            context.pageData.functions = context.pageData.functions || {}; 
-            context.pageData.functions[context.tempFunctionName] = "(function() {})"; 
-            context.selectedFunctionName = context.tempFunctionName; 
-            context.selectedFunctionCode = "(function() {})";
-            return {context}; 
+            api.context.addFunctionOpenModal = false; 
+            api.context.pageData = api.context.pageData || {}; 
+            api.context.pageData.functions = api.context.pageData.functions || {}; 
+            api.context.pageData.functions[api.context.tempFunctionName] = "(function() {})"; 
+            api.context.selectedFunctionName = api.context.tempFunctionName; 
+            api.context.selectedFunctionCode = "(function() {})";
+            return {context: api.context}; 
         }
     })`;
     let codeEditorChanged = `(async function() {
-        console.log(eventPayload);    
-        console.log(context);    
-        let ctx = context || {};    
-        let elementId = eventPayload?.payload?.id;    
-        let codeEditorValue = eventPayload?.payload?.value || {};
-        let codeEditorPosition = eventPayload?.payload?.position || {line: 1, column: 0};
+        console.log(api.eventPayload);    
+        console.log(api.context);    
+        let ctx = api.context || {};    
+        let elementId = api.eventPayload?.payload?.id;    
+        let codeEditorValue = api.eventPayload?.payload?.value || {};
+        let codeEditorPosition = api.eventPayload?.payload?.position || {line: 1, column: 0};
         if(elementId == "functionEditor") {
             ctx.pageData = ctx.pageData || {};        
             ctx.pageData.functions = ctx.pageData.functions || {};       
@@ -46,11 +52,11 @@ export const getPageDetails = async () => {
     })`;
 
     let buttonClicked = `(async function() {
-        let elementId = eventPayload?.payload?.id;   
-        let ctx = context || {}; 
+        let elementId = api.eventPayload?.payload?.id;   
+        let ctx = api.context || {}; 
         if(elementId == "UpdatePreview") {    
-            let pageData = context.pageData || "{}";
-            pageData = typeof context.pageData == "string"? JSON.parse(pageData): pageData;    
+            let pageData = ctx.pageData || "{}";
+            pageData = typeof ctx.pageData == "string"? JSON.parse(pageData): pageData;    
             let pageContents = pageData?.contents || [];
             pageContents = typeof pageContents == "string"? JSON.parse(pageContents): pageContents;    
             let pageContext = pageData?.context || {};    
@@ -68,51 +74,78 @@ export const getPageDetails = async () => {
 
     const embeddedCodeTemplate = `
 <script>
+    var lzscript = document.createElement('script');
+    // Create the script element to download lzString
+    lzscript.src = 'https://know.srste.in/assets/cdn/lzstring.js';
+    lzscript.defer = true;
+
     document.addEventListener('DOMContentLoaded', function () {
-    
-    // Create the script element
-    var script = document.createElement('script');
-    script.src = 'https://know.srste.in/srste.js';
-    script.defer = true;
 
-    // Create the link element for the stylesheet
-    var link = document.createElement('link');
-    link.href = 'https://know.srste.in/static/css/main.621ff9de.css';
-    link.rel = 'stylesheet';
+        // Create the script element
+        var script = document.createElement('script');
+        script.src = 'https://know.srste.in/srste.js';
+        script.defer = true;
 
-    // Create the div element
-    var div = document.createElement('div');
-    div.id = '__srsteroot__';
+        // Create the link element for the stylesheet
+        var link = document.createElement('link');
+        link.href = 'https://know.srste.in/static/css/main.621ff9de.css';
+        link.rel = 'stylesheet';
 
-    // Append the elements to the document body
-    document.body.appendChild(script);
-    document.head.appendChild(link);
-    document.body.appendChild(div);
+        // Create the div element
+        var div = document.createElement('div');
+        div.id = '__srsteroot__';
+
+        // Append the elements to the document body
+        document.body.appendChild(lzscript);
+        document.body.appendChild(script);
+        document.head.appendChild(link);
+        document.body.appendChild(div);
     });
+
     window.__SRS__ = window.__SRS__ || {};
     window.__SRS__.mode = \"sandbox\";
-    window.__SRS__.contents = $$contents$$;
-    window.__SRS__.context = $$context$$;
-    window.__SRS__.functions = $$functions$$;
+    var contents = $$contents$$;
+    if(contents.startsWith("##CMP##")) {
+        lzscript.addEventListener('load', function() {
+            contents = contents.split("##CMP##")[1];
+            const bytes = Array.from(contents, char => char.charCodeAt(0));
+            const decoder = new TextDecoder();
+            contents = decoder.decode(new Uint8Array(bytes));           
+            contents = LZString.decompressFromBase64(contents);
+            window.__SRS__.contents = JSON.parse(contents);
+            window.__SRS__.context = $$context$$;
+            window.__SRS__.functions = $$functions$$;
+        }); 
+    }else {
+        window.__SRS__.contents = contents;
+        window.__SRS__.context = $$context$$;
+        window.__SRS__.functions = $$functions$$;
+    }
 </script>`;
 
     let getEmbeddedCodeExpression = `data.template.replace('$$contents$$', JSON.stringify(data.contents)).replace('$$context$$', JSON.stringify(data.context, null, 4)).replace('$$functions$$', JSON.stringify(data.functions, null, 4))`;
 
     let showEmbedCodeClicked = `(async function() {
-        
-        let elementId = eventPayload?.payload?.id;   
-        let ctx = context || {}; 
+       
+        let elementId = api.eventPayload?.payload?.id;   
+        let ctx = api.context || {}; 
         if(elementId == "ShowEmbedCode") {    
-            let pageData = context.pageData || "{}";
-            pageData = typeof context.pageData == "string"? JSON.parse(pageData): pageData;    
+            let pageData = ctx.pageData || "{}";
+            pageData = typeof pageData == "string"? JSON.parse(pageData): pageData;    
             let pageContents = pageData?.contents || [];
-            pageContents = typeof pageContents == "string"? JSON.parse(pageContents): pageContents;    
+            pageContents = typeof pageContents == "string"? JSON.parse(pageContents): pageContents;  
+            
+            let compressedPageContents = api.helper.compress(JSON.stringify(pageContents));
+            debugger;
+            const encoder = new TextEncoder();
+            compressedPageContents = "##CMP##" + encoder.encode(compressedPageContents).reduce((str, byte) => str + String.fromCharCode(byte),""); 
+
             let pageContext = pageData?.context || {};    
             pageContext = typeof pageContext == "string"? JSON.parse(pageContext): pageContext;    
             let pageFunctions = pageData?.functions || {};    
             pageFunctions = typeof pageFunctions == "string"? JSON.parse(pageFunctions): pageFunctions;  
             let getEmbeddedCode = new Function("data", "with(data) { return ${getEmbeddedCodeExpression}; }");
-            ctx.embeddedCode = getEmbeddedCode({template: \`${embeddedCodeTemplate}\`, contents: pageContents, context: pageContext, functions: pageFunctions});
+            ctx.embeddedCode = getEmbeddedCode({template: \`${embeddedCodeTemplate}\`, contents: compressedPageContents, context: pageContext, functions: pageFunctions});
             ctx.showEmbeddedCodeModal = true;
             ctx.openedModals = ctx.openedModals || [];
             let currentModal = ctx.openedModals.pop();
@@ -128,281 +161,286 @@ export const getPageDetails = async () => {
 
     let undoClicked = `(async function() {
         
-        let elementId = eventPayload?.payload?.id;   
+        let elementId = api.eventPayload?.payload?.id;   
+        let ctx = api.context || {}; 
         if(elementId == "Undo") {   
-            debugger; 
-            let pageData = context.pageData || "{}";
-            pageData = typeof context.pageData == "string"? JSON.parse(pageData): pageData;  
-            if (context.contentHistoryIndex > 0) {  
-                context.contentHistoryIndex = context.contentHistoryIndex - 1;
-                let updatedContentItems = context.contentHistory[context.contentHistoryIndex];
-                context.pageData.contents = updatedContentItems;
-                let previewData = context.previewData || {};
+             
+            let pageData = ctx.pageData || "{}";
+            pageData = typeof ctx.pageData == "string"? JSON.parse(pageData): pageData;  
+            if (ctx.contentHistoryIndex > 0) {  
+                ctx.contentHistoryIndex = ctx.contentHistoryIndex - 1;
+                let updatedContentItems = ctx.contentHistory[ctx.contentHistoryIndex];
+                ctx.pageData.contents = updatedContentItems;
+                let previewData = ctx.previewData || {};
                 if(typeof previewData == "string") {
                     previewData = JSON.parse(previewData);
                     previewData.contents = updatedContentItems;
                 }else {
                     previewData.contents = updatedContentItems;
                 }
-                context.previewData = previewData;
+                ctx.previewData = previewData;
             }
-            return {context};
+            return {context: ctx};
         }
     })`;
 
     let redoClicked = `(async function() {
         
-        let elementId = eventPayload?.payload?.id;   
-        let ctx = context || {}; 
+        let elementId = api.eventPayload?.payload?.id;   
+        let ctx = api.context || {}; 
         if(elementId == "Redo") {  
-            debugger;  
-            let pageData = context.pageData || "{}";
-            pageData = typeof context.pageData == "string"? JSON.parse(pageData): pageData;  
-            if (context.contentHistoryIndex < context.contentHistory.length - 1) {  
-                context.contentHistoryIndex = context.contentHistoryIndex + 1;
-                let updatedContentItems = context.contentHistory[context.contentHistoryIndex];
-                context.pageData.contents = updatedContentItems;
-                let previewData = context.previewData || {};
+              
+            let pageData = ctx.pageData || "{}";
+            pageData = typeof ctx.pageData == "string"? JSON.parse(pageData): pageData;  
+            if (ctx.contentHistoryIndex < ctx.contentHistory.length - 1) {  
+                ctx.contentHistoryIndex = ctx.contentHistoryIndex + 1;
+                let updatedContentItems = ctx.contentHistory[ctx.contentHistoryIndex];
+                ctx.pageData.contents = updatedContentItems;
+                let previewData = ctx.previewData || {};
                 if(typeof previewData == "string") {
                     previewData = JSON.parse(previewData);
                     previewData.contents = updatedContentItems;
                 }else {
                     previewData.contents = updatedContentItems;
                 }
-                context.previewData = previewData;
-                return {context};
+                ctx.previewData = previewData;
+                return {context: ctx};
             }
         }
     })`;
     
     let selectChanged = `(async function() {    
             
-        console.log(eventPayload);    
-        let elementId = eventPayload?.payload?.id || "";    
-        let pageData = context.pageData || "{}";    
-        pageData = typeof context.pageData == "string"? JSON.parse(pageData): pageData;   
+        console.log(api.eventPayload);    
+        let elementId = api.eventPayload?.payload?.id || "";
+        let ctx = api.context || {};     
+        let pageData = ctx.pageData || "{}";    
+        pageData = typeof ctx.pageData == "string"? JSON.parse(pageData): pageData;   
         let pageFunctions = pageData?.functions || {};   
         pageFunctions = typeof pageFunctions == "string"? JSON.parse(pageFunctions): pageFunctions;        
         if(elementId == "functionsList") {        
-            let selectedFunction = eventPayload?.payload?.value || "";
-            context.selectedFunctionName = selectedFunction || "";        
-            context.selectedFunctionCode = pageFunctions[selectedFunction] || "";    
-            return {context};
+            let selectedFunction = api.eventPayload?.payload?.value || "";
+            ctx.selectedFunctionName = selectedFunction || "";        
+            ctx.selectedFunctionCode = pageFunctions[selectedFunction] || "";    
+            return {context: ctx};
         }    
     })`;
     let onRemoveFunctionBtnClicked = `(async function() {    
-        let elementId = eventPayload?.payload?.id || "";    
+        let elementId = api.eventPayload?.payload?.id || "";    
+        let ctx = api.context || {};    
         if(elementId == "functionsRemoveBtn") { 
-            context.removeFunctionOpenModal = true;
-            context.openedModals = context.openedModals || [];
-            let currentModal = context.openedModals.pop();
+            ctx.removeFunctionOpenModal = true;
+            ctx.openedModals = ctx.openedModals || [];
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
-                context.openedModals.push(currentModal);
+                ctx[currentModal] = false;
+                ctx.openedModals.push(currentModal);
             }
-            context.openedModals.push("removeFunctionOpenModal");
+            ctx.openedModals.push("removeFunctionOpenModal");
             return {context} 
         }else if(elementId == "removeFnModalApplyBtn") { 
-            context.pageData = context.pageData || {}; 
-            context.pageData.functions = context.pageData.functions || {}; 
-            delete context.pageData.functions[context.tempFunctionName]; 
-            let functionNames = Object.keys(context.pageData.functions || {}); 
-            context.selectedFunctionName = functionNames && functionNames.length > 0? functionNames[0]: ""; 
-            context.selectedFunctionCode = functionNames && functionNames.length > 0? context.pageData.functions[functionNames[0]]: ""; 
-            context.removeFunctionOpenModal = false;
-            return {context} 
+            ctx.pageData = ctx.pageData || {}; 
+            ctx.pageData.functions = ctx.pageData.functions || {}; 
+            delete ctx.pageData.functions[ctx.tempFunctionName]; 
+            let functionNames = Object.keys(ctx.pageData.functions || {}); 
+            ctx.selectedFunctionName = functionNames && functionNames.length > 0? functionNames[0]: ""; 
+            ctx.selectedFunctionCode = functionNames && functionNames.length > 0? ctx.pageData.functions[functionNames[0]]: ""; 
+            ctx.removeFunctionOpenModal = false;
+            return {context: ctx} 
         } 
         
     })`;
     let onEditFunctionBtnClicked = `(async function() {    
-        
-        let elementId = eventPayload?.payload?.id || "";    
+        let elementId = api.eventPayload?.payload?.id || "";    
+        let ctx = api.context || {};  
         if(elementId == "functionsEditBtn") { 
-            context.editFunctionOpenModal = true;
-            context.openedModals = context.openedModals || [];
-            let currentModal = context.openedModals.pop();
+            ctx.editFunctionOpenModal = true;
+            ctx.openedModals = ctx.openedModals || [];
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
-                context.openedModals.push(currentModal);
+                ctx[currentModal] = false;
+                ctx.openedModals.push(currentModal);
             }
-            context.openedModals.push("editFunctionOpenModal");
-            return {context}
+            ctx.openedModals.push("editFunctionOpenModal");
+            return {context: ctx}
         }else if(elementId == "editFnModalApplyBtn") { 
-            context.pageData = context.pageData || {}; 
-            context.pageData.functions = context.pageData.functions || {}; 
-            let selectedFunctionCode = context.pageData.functions[context.selectedFunctionName] + "";
-            delete context.pageData.functions[context.selectedFunctionName];
-            context.pageData.functions[context.tempFunctionName] = selectedFunctionCode;
-            context.selectedFunctionName = context.tempFunctionName;
-            context.editFunctionOpenModal = false;
-            return {context}
+            ctx.pageData = ctx.pageData || {}; 
+            ctx.pageData.functions = ctx.pageData.functions || {}; 
+            let selectedFunctionCode = ctx.pageData.functions[ctx.selectedFunctionName] + "";
+            delete ctx.pageData.functions[ctx.selectedFunctionName];
+            ctx.pageData.functions[ctx.tempFunctionName] = selectedFunctionCode;
+            ctx.selectedFunctionName = ctx.tempFunctionName;
+            ctx.editFunctionOpenModal = false;
+            return {context: ctx}
         } 
     })`;
 
     let onAddFunctionModalClosed = `(async function() {    
-        if(eventPayload?.payload?.id == "modalCancelBtn") { 
-            context.addFunctionOpenModal = false; 
-            let currentModal = context.openedModals.pop();
+        let ctx = api.context || {}; 
+        if(api.eventPayload?.payload?.id == "modalCancelBtn") { 
+            ctx.addFunctionOpenModal = false; 
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             }
-            return {context}
+            return {context: ctx}
         } 
         
     })`;
     
     let onRemoveFunctionModalClosed = `(async function() {    
-        if(eventPayload?.payload?.id == "removeFnModalCancelBtn") { 
-            context.removeFunctionOpenModal = false; 
-            let currentModal = context.openedModals.pop();
+        let ctx = api.context || {}; 
+        if(api.eventPayload?.payload?.id == "removeFnModalCancelBtn") { 
+            ctx.removeFunctionOpenModal = false; 
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             }
-            return {context}
+            return {context: ctx}
         } 
         
     })`;
     let onEditFunctionModalClosed = `(async function() {    
-        
-        if(eventPayload?.payload?.id == "editFnModalCancelBtn") { 
-            context.editFunctionOpenModal = false; 
-            let currentModal = context.openedModals.pop();
+        let ctx = api.context || {};
+        if(api.eventPayload?.payload?.id == "editFnModalCancelBtn") { 
+            ctx.editFunctionOpenModal = false; 
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             }
-            return {context}
+            return {context: ctx}
         } 
         
     })`;
     let onPreviewModalClosed = `(async function() {    
-        if(eventPayload?.payload?.id == "previewModalCancelBtn") { 
-            context.previewOpenModal = false;
-            let currentModal = context.openedModals.pop();
+        let ctx = api.context || {};
+        if(api.eventPayload?.payload?.id == "previewModalCancelBtn") { 
+            ctx.previewOpenModal = false;
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             } 
-            return {context}
+            return {context: ctx}
         } 
         
     })`;
     let onShowEmbeddedCodeModalClosed = `(async function() { 
-           
-        if(eventPayload?.payload?.id == "showEmbeddedCodeModalCancelBtn") { 
-            context.showEmbeddedCodeModal = false;
-            let currentModal = context.openedModals.pop();
+        let ctx = api.context || {};
+        if(api.eventPayload?.payload?.id == "showEmbeddedCodeModalCancelBtn") { 
+            ctx.showEmbeddedCodeModal = false;
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             } 
-            return {context}
+            return {context: ctx}
         } 
         
     })`;
     
     let onComponentAddModalClosed = `(async function() {  
-          
-        if(eventPayload?.payload?.id == "componentAddModalCancelBtn") { 
-            context.componentAddOpenModal = false;
-            let currentModal = context.openedModals.pop();
+        let ctx = api.context || {};
+        if(api.eventPayload?.payload?.id == "componentAddModalCancelBtn") { 
+            ctx.componentAddOpenModal = false;
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             }
-            context.selectedComponentForAdd = "";
-            return {context}
+            ctx.selectedComponentForAdd = "";
+            return {context: ctx}
         } 
         
     })`;
     let onComponentRemoveModalClosed = `(async function() {  
-          
-        if(eventPayload?.payload?.id == "componentRemoveModalCancelBtn") { 
-            context.componentRemoveOpenModal = false;
-            let currentModal = context.openedModals.pop();
+        let ctx = api.context || {};
+        if(api.eventPayload?.payload?.id == "componentRemoveModalCancelBtn") { 
+            ctx.componentRemoveOpenModal = false;
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             }
-            context.selectedComponentToRemove = "";
-            return {context}
+            ctx.selectedComponentToRemove = "";
+            return {context: ctx}
         } 
         
     })`;
     let onComponentSettingsModalClosed = `(async function() {  
-        debugger;
-        if(eventPayload?.payload?.id == "componentSettingsModalCancelBtn") { 
-            context.componentSettingsOpenModal = false;
-            let currentModal = context.openedModals.pop();
+        let ctx = api.context || {};
+        if(api.eventPayload?.payload?.id == "componentSettingsModalCancelBtn") { 
+            ctx.componentSettingsOpenModal = false;
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             }
-            context.selectedComponentForSettings = "";
-            return {context}
+            ctx.selectedComponentForSettings = "";
+            return {context: ctx}
         } 
         
     })`;
     let onComponentEditBlockModalClosed = `(async function() {  
-          
-        if(eventPayload?.payload?.id == "componentEditBlockModalCancelBtn") { 
-            context.componentEditBlockOpenModal = false;
-            let currentModal = context.openedModals.pop();
+        let ctx = api.context || {};
+        if(api.eventPayload?.payload?.id == "componentEditBlockModalCancelBtn") { 
+            ctx.componentEditBlockOpenModal = false;
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             }
-            context.selectedComponentForEditBlock = "";
-            return {context}
+            ctx.selectedComponentForEditBlock = "";
+            return {context: ctx}
         } 
         
     })`;
 
     let onEditBlockApplyBtnClicked = `(async function() {  
-        if(eventPayload?.payload?.id == "EditBlockApply") { 
-            debugger;
-
-            let contentItems = context.pageData.contents;
+        let ctx = api.context || {};
+        if(api.eventPayload?.payload?.id == "EditBlockApply") { 
+            let contentItems = ctx.pageData.contents;
             contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
-            let elementToUpdate = api.findElement(context.selectedComponentForEditBlock, contentItems);
+            let elementToUpdate = api.helper.findElement(ctx.selectedComponentForEditBlock, contentItems);
             
             function findAndReplace(tree, targetName, replacement) {
                 return tree.map(node => {
@@ -417,242 +455,261 @@ export const getPageDetails = async () => {
                 });
             }
 
-            let editBlockCode = context.editBlockCode;
+            let editBlockCode = ctx.editBlockCode;
             if(typeof editBlockCode == "string") {
                 editBlockCode = JSON.parse(editBlockCode);
             }
-            const updatedContentItems = findAndReplace(contentItems, context.selectedComponentForEditBlock, editBlockCode);
+            const updatedContentItems = findAndReplace(contentItems, ctx.selectedComponentForEditBlock, editBlockCode);
 
-            context.pageData.contents = updatedContentItems;
-            let previewData = context.previewData || {};
+            ctx.pageData.contents = updatedContentItems;
+            let previewData = ctx.previewData || {};
             if(typeof previewData == "string") {
                 previewData = JSON.parse(previewData);
                 previewData.contents = updatedContentItems;
             }else {
                 previewData.contents = updatedContentItems;
             }
-            context.previewData = previewData;
+            ctx.previewData = previewData;
 
-            context.contentHistory.push(JSON.parse(JSON.stringify(updatedContentItems)));
-            context.contentHistoryIndex = context.contentHistoryIndex + 1;
+            ctx.contentHistory.push(JSON.parse(JSON.stringify(updatedContentItems)));
+            ctx.contentHistoryIndex = ctx.contentHistoryIndex + 1;
             
-            context.componentEditBlockOpenModal = false;
-            let currentModal = context.openedModals.pop();
+            ctx.componentEditBlockOpenModal = false;
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             }
-            context.selectedComponentForEditBlock = "";
-            return {context}
+            ctx.selectedComponentForEditBlock = "";
+            return {context: ctx}
         } 
         
     })`;
 
     let onFunctionNameChanged = `(async function() {    
-        let elementId = eventPayload?.payload?.id || "";    
+        let elementId = api.eventPayload?.payload?.id || "";    
         if(elementId == "functionNameField" || elementId == "editFunctionNameField") { 
-            context.tempFunctionName = eventPayload?.payload?.value;
-            return {context} 
+            api.context.tempFunctionName = api.eventPayload?.payload?.value;
+            return {context: api.context} 
         } 
     })`;
 
     let showPreviewScreen = `(async function() {
-        let elementId = eventPayload?.payload?.id || "";
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id || "";
         if(elementId == "previewScreen") {
-            debugger;
-            context.previewOpenModal = true;
-            context.openedModals = context.openedModals || [];
-            let currentModal = context.openedModals.pop();
+            ctx.previewOpenModal = true;
+            ctx.openedModals = ctx.openedModals || [];
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
-                context.openedModals.push(currentModal);
+                ctx[currentModal] = false;
+                ctx.openedModals.push(currentModal);
             }
-            context.openedModals.push("previewOpenModal");
-            context.screenType = "desktop";
-            context.screenOrientation = 1;
-            return {context};
+            ctx.openedModals.push("previewOpenModal");
+            ctx.screenType = "desktop";
+            ctx.screenOrientation = 1;
+            return {context: ctx};
         }
         
     })`;
 
     let onComponentAddClicked = `(async function() {    
-        
-        let elementId = eventPayload?.payload?.id || "";    
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id || "";    
         console.log("in onComponentAddClicked", elementId);
-        context.selectedComponentForAdd = elementId;
-        context.componentAddOpenModal = true;
-        context.openedModals = context.openedModals || [];
-        let currentModal = context.openedModals.pop();
+        ctx.selectedComponentForAdd = elementId;
+        let contentItems = ctx.pageData.contents;
+        contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
+        let matchedElement = api.helper.findElement(elementId, contentItems);
+        ctx.selectedComponentTypeForAdd  = matchedElement?.tag || "";
+        ctx.componentAddOpenModal = true;
+        ctx.openedModals = ctx.openedModals || [];
+        let currentModal = ctx.openedModals.pop();
         if(currentModal) {
-            context[currentModal] = false;
-            context.openedModals.push(currentModal);
+            ctx[currentModal] = false;
+            ctx.openedModals.push(currentModal);
         }
-        context.openedModals.push("componentAddOpenModal");
-        return {context}
+        ctx.openedModals.push("componentAddOpenModal");
+        return {context: ctx}
     })`;
 
     let onComponentRemoveClicked = `(async function() {    
-        
-        let elementId = eventPayload?.payload?.id || "";    
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id || "";    
         console.log("in onComponentRemoveClicked", elementId);
-        context.selectedComponentToRemove = elementId;
-        context.componentRemoveOpenModal = true;
-        context.openedModals = context.openedModals || [];
-        let currentModal = context.openedModals.pop();
+        ctx.selectedComponentToRemove = elementId;
+        ctx.componentRemoveOpenModal = true;
+        ctx.openedModals = ctx.openedModals || [];
+        let currentModal = ctx.openedModals.pop();
         if(currentModal) {
-            context[currentModal] = false;
-            context.openedModals.push(currentModal);
+            ctx[currentModal] = false;
+            ctx.openedModals.push(currentModal);
         }
-        context.openedModals.push("componentRemoveOpenModal");
-        return {context}
+        ctx.openedModals.push("componentRemoveOpenModal");
+        return {context: ctx}
     })`;
 
     let onComponentRemoveApplyClicked = `(async function() {    
-        
-        let elementId = eventPayload?.payload?.id || "";    
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id || "";    
         if(elementId == "componentRemoveModalApplyBtn") {
-            debugger;
-            console.log("Removing " + context.selectedComponentToRemove);
-            let contentItems = context.pageData.contents;
+            console.log("Removing " + ctx.selectedComponentToRemove);
+            let contentItems = ctx.pageData.contents;
             contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
-            let updatedContentItems = api.removeElement(context.selectedComponentToRemove, contentItems);
-            context.pageData.contents = updatedContentItems;
-            let previewData = context.previewData || {};
+            let updatedContentItems = api.removeElement(ctx.selectedComponentToRemove, contentItems);
+            ctx.pageData.contents = updatedContentItems;
+            let previewData = ctx.previewData || {};
             if(typeof previewData == "string") {
                 previewData = JSON.parse(previewData);
                 previewData.contents = updatedContentItems;
             }else {
                 previewData.contents = updatedContentItems;
             }
-            context.previewData = previewData;
+            ctx.previewData = previewData;
 
-            context.contentHistory.push(JSON.parse(JSON.stringify(updatedContentItems)));
-            context.contentHistoryIndex = context.contentHistoryIndex + 1;
+            ctx.contentHistory.push(JSON.parse(JSON.stringify(updatedContentItems)));
+            ctx.contentHistoryIndex = ctx.contentHistoryIndex + 1;
 
-            context.componentRemoveOpenModal = false;
-            let currentModal = context.openedModals.pop();
+            ctx.componentRemoveOpenModal = false;
+            let currentModal = ctx.openedModals.pop();
             if(currentModal) {
-                context[currentModal] = false;
+                ctx[currentModal] = false;
             }
-            let previousModal = context.openedModals.pop();
+            let previousModal = ctx.openedModals.pop();
             if(previousModal) {
-                context[previousModal] = true;
-                context.openedModals.push(previousModal);
+                ctx[previousModal] = true;
+                ctx.openedModals.push(previousModal);
             }
-            context.selectedComponentToRemove = "";
-            return {context};
+            ctx.selectedComponentToRemove = "";
+            return {context: ctx};
         }
     })`;
 
     let onComponentSettingsClicked = `(async function() {    
-        
-        let elementId = eventPayload?.payload?.id || "";    
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id || "";    
         console.log("in onComponentSettingsClicked", elementId);
-        context.selectedComponentForSettings = elementId;
-        context.componentSettingsOpenModal = true;
-        context.openedModals = context.openedModals || [];
-        let currentModal = context.openedModals.pop();
-        if(currentModal) {
-            context[currentModal] = false;
-            context.openedModals.push(currentModal);
+        ctx.selectedComponentForSettings = elementId;
+        let contentItems = ctx.pageData.contents;
+        contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
+        let matchedElement = api.helper.findElement(elementId, contentItems);
+        ctx.selectedComponentTypeForSettings  = matchedElement?.tag || "";
+        let selectedComponentPropData = {};
+        
+        if(matchedElement?.props && Object.keys(matchedElement.props).length > 0) {
+            Object.keys(matchedElement.props).map((propName) => {
+                selectedComponentPropData[propName] = {
+                    defaultValue: matchedElement.props[propName],
+                    overrideValue: matchedElement.overrides?.[propName] || ""
+                }
+            })
         }
-        context.openedModals.push("componentSettingsOpenModal");
-        return {context}
+        ctx.selectedComponentPropData = selectedComponentPropData;
+        ctx.componentSettingsOpenModal = true;
+        ctx.openedModals = ctx.openedModals || [];
+        let currentModal = ctx.openedModals.pop();
+        if(currentModal) {
+            ctx[currentModal] = false;
+            ctx.openedModals.push(currentModal);
+        }
+        ctx.openedModals.push("componentSettingsOpenModal");
+        return {context: ctx}
     })`;
 
     let onComponentEditBlockClicked = `(async function() {    
-        
-        let elementId = eventPayload?.payload?.id || "";    
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id || "";    
         console.log("in onComponentEditBlockClicked", elementId);
-        context.selectedComponentForEditBlock = elementId;
+        ctx.selectedComponentForEditBlock = elementId;
 
-        let pageDataContents = context.pageData.contents || [];
+        let pageDataContents = ctx.pageData.contents || [];
         if(typeof pageDataContents == "string") {
             pageDataContents = JSON.parse(pageDataContents);
         }
-        let matchingElement = api.findElement(context.selectedComponentForEditBlock, pageDataContents);
-        context.editBlockCode = matchingElement || {};
+        let matchingElement = api.helper.findElement(ctx.selectedComponentForEditBlock, pageDataContents);
+        ctx.editBlockCode = matchingElement || {};
 
-        context.componentEditBlockOpenModal = true;
-        context.openedModals = context.openedModals || [];
-        let currentModal = context.openedModals.pop();
+        ctx.componentEditBlockOpenModal = true;
+        ctx.openedModals = ctx.openedModals || [];
+        let currentModal = ctx.openedModals.pop();
         if(currentModal) {
-            context[currentModal] = false;
-            context.openedModals.push(currentModal);
+            ctx[currentModal] = false;
+            ctx.openedModals.push(currentModal);
         }
-        context.openedModals.push("componentEditBlockOpenModal");
-        return {context}
+        ctx.openedModals.push("componentEditBlockOpenModal");
+        return {context: ctx}
     })`;
 
     let setPreviewPanelMode = `(async function() {
-        
-        let elementId = eventPayload?.payload?.id || "";
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id || "";
         let elementMatched = false;
         if(elementId) {
             switch(elementId) {
                 case "FullPreviewScreen": 
-                    context.previewPanelMode = 1;
-                    context.leftContainerColumns = 1;
-                    context.rightContainerColumns = 11;
-                    context.leftContainerWidth = "5vw";
+                    ctx.previewPanelMode = 1;
+                    ctx.leftContainerColumns = 1;
+                    ctx.rightContainerColumns = 11;
+                    ctx.leftContainerWidth = "5vw";
                     elementMatched = true;
                     break;
                 case "MorePreviewScreen": 
-                    context.previewPanelMode = 2;
-                    context.leftContainerColumns = 3;
-                    context.rightContainerColumns = 9;
-                    context.leftContainerWidth = "23vw";
+                    ctx.previewPanelMode = 2;
+                    ctx.leftContainerColumns = 3;
+                    ctx.rightContainerColumns = 9;
+                    ctx.leftContainerWidth = "23vw";
                     elementMatched = true;
                     break;
                 case "MidPreviewScreen": 
-                    context.previewPanelMode = 3;
-                    context.leftContainerColumns = 6;
-                    context.rightContainerColumns = 6;
-                    context.leftContainerWidth = "47vw";
+                    ctx.previewPanelMode = 3;
+                    ctx.leftContainerColumns = 6;
+                    ctx.rightContainerColumns = 6;
+                    ctx.leftContainerWidth = "47vw";
                     elementMatched = true;
                     break;
                 case "LessPreviewScreen":
-                    context.previewPanelMode = 4;
-                    context.leftContainerColumns = 9;
-                    context.rightContainerColumns = 3;
-                    context.leftContainerWidth = "70vw";
+                    ctx.previewPanelMode = 4;
+                    ctx.leftContainerColumns = 9;
+                    ctx.rightContainerColumns = 3;
+                    ctx.leftContainerWidth = "70vw";
                     elementMatched = true;
                     break;
             } 
         }
         if(elementMatched) {
-            return {context};
+            return {context: ctx};
         }
         
     })`;
     let setResponsiveness = `(async function() {
-        let elementId = eventPayload?.payload?.id || "";
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id || "";
         if(elementId && (elementId == "largeScreen" || elementId == "desktopScreen" || elementId == "laptopScreen" || elementId == "tabletScreen" || elementId == "mobileScreen" || elementId == "rotateScreen" )) {
             switch(elementId) {
                 case "largeScreen": 
-                    context.screenType = "largeScreen";
+                    ctx.screenType = "largeScreen";
                     break;
                 case "desktopScreen": 
-                    context.screenType = "desktop";
+                    ctx.screenType = "desktop";
                     break;
                 case "laptopScreen": 
-                    context.screenType = "laptop";
+                    ctx.screenType = "laptop";
                     break;
                 case "tabletScreen": 
-                    context.screenType = "tablet";
+                    ctx.screenType = "tablet";
                     break;
                 case "mobileScreen": 
-                    context.screenType = "mobile";
+                    ctx.screenType = "mobile";
                     break;
                 case "rotateScreen": 
-                    context.screenOrientation = (context.screenOrientation  == 1)? 0: 1;
+                    ctx.screenOrientation = (ctx.screenOrientation  == 1)? 0: 1;
                     break;
             }   
-            let screenOrientation = context.screenOrientation == 0? "portrait": "landscape"; //landscape = 1 and portrait = 0
+            let screenOrientation = ctx.screenOrientation == 0? "portrait": "landscape"; //landscape = 1 and portrait = 0
 
             let screenHeight = "calc(100vh - 12rem)";
             let screenWidth = "calc(100vw - 10rem)";
@@ -661,58 +718,210 @@ export const getPageDetails = async () => {
                 screenHeight = "calc(100vw - 10rem)";
                 screenWidth = "calc(100vh - 12rem)";
             }
-            let screenType = context.screenType || "laptop";
+            let screenType = ctx.screenType || "laptop";
             if(screenType) {
                 switch(screenType) {
                     case "largeScreen": 
                         if(screenOrientation == "landscape") {
-                            context.screenWidth = "3840px";
-                            context.screenHeight = "2160px";
+                            ctx.screenWidth = "3840px";
+                            ctx.screenHeight = "2160px";
                         }else {
-                            context.screenWidth = "2160px";
-                            context.screenHeight = "3840px";
+                            ctx.screenWidth = "2160px";
+                            ctx.screenHeight = "3840px";
                         }
                         break;
                     case "desktop":
                         if(screenOrientation == "landscape") {
-                            context.screenWidth = "1920px";
-                            context.screenHeight = "1080px";
+                            ctx.screenWidth = "1920px";
+                            ctx.screenHeight = "1080px";
                         }else {
-                            context.screenWidth = "1080px";
-                            context.screenHeight = "1920px";
+                            ctx.screenWidth = "1080px";
+                            ctx.screenHeight = "1920px";
                         }
                         break;
                     case "laptop": 
                         if(screenOrientation == "landscape") {
-                            context.screenWidth = "1366px";
-                            context.screenHeight = "768px";
+                            ctx.screenWidth = "1366px";
+                            ctx.screenHeight = "768px";
                         }else {
-                            context.screenWidth = "768px";
-                            context.screenHeight = "1366px";
+                            ctx.screenWidth = "768px";
+                            ctx.screenHeight = "1366px";
                         }
                         break;
                     case "tablet": 
                         if(screenOrientation == "landscape") {
-                            context.screenWidth = "820px";
-                            context.screenHeight = "1180px";
+                            ctx.screenWidth = "820px";
+                            ctx.screenHeight = "1180px";
                         }else {
-                            context.screenWidth = "1180px";
-                            context.screenHeight = "820px";
+                            ctx.screenWidth = "1180px";
+                            ctx.screenHeight = "820px";
                         }
                         break;
                     case "mobile":
                         if(screenOrientation == "landscape") {
-                            context.screenWidth = "390px";
-                            context.screenHeight = "850px";
+                            ctx.screenWidth = "390px";
+                            ctx.screenHeight = "850px";
                         }else {
-                            context.screenWidth = "850px";
-                            context.screenHeight = "390px";
+                            ctx.screenWidth = "850px";
+                            ctx.screenHeight = "390px";
                         }
                         break;
                 }
             }
 
-            return {context};
+            return {context: ctx};
+        }
+    })`;
+
+    let componentDataUpdate = `(async function() {
+        debugger;
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.elementId || "";
+
+        function findAndReplace(tree, targetName, replacement) {
+            return tree.map(node => {
+              if (node.elementId === targetName) {
+                return replacement; // Replace the target node with the replacement subtree
+              } else if (node.children && node.children.length > 0) {
+                // Recursively search for the target node in the children
+                const newChildren = findAndReplace(node.children, targetName, replacement);
+                return { ...node, children: newChildren };
+              }
+              return node; // No replacement needed for this node
+            });
+        }
+
+        if(elementId) {
+            let componentData = api.eventPayload?.payload || null;
+            if(componentData) {
+                let contentItems = ctx.pageData.contents;
+                contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
+                let element = api.helper.findElement(elementId, contentItems)
+                if(element) {
+                    element = {...element, ...componentData};
+                    contentItems = findAndReplace(contentItems, elementId, element);
+                    ctx.pageData.contents = contentItems;
+                    let previewData = ctx.previewData || {};
+                    if(typeof previewData == "string") {
+                        previewData = JSON.parse(previewData);
+                        previewData.contents = contentItems;
+                    }else {
+                        previewData.contents = contentItems;
+                    }
+                    ctx.previewData = previewData;
+
+                    ctx.contentHistory.push(JSON.parse(JSON.stringify(contentItems)));
+                    ctx.contentHistoryIndex = ctx.contentHistoryIndex + 1;
+                    
+                    ctx.componentSettingsOpenModal = false;
+                    let currentModal = ctx.openedModals.pop();
+                    if(currentModal) {
+                        ctx[currentModal] = false;
+                    }
+                    let previousModal = ctx.openedModals.pop();
+                    if(previousModal) {
+                        ctx[previousModal] = true;
+                        ctx.openedModals.push(previousModal);
+                    }
+                    ctx.selectedComponentForSettings = "";
+
+                    return {context: ctx}
+                }
+            }
+        }
+    })`;
+
+    let addComponentData = `(async function() {
+        debugger;
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.elementId || "";
+
+        function findAndReplace(tree, targetName, replacement) {
+            return tree.map(node => {
+              if (node.elementId === targetName) {
+                return replacement; // Replace the target node with the replacement subtree
+              } else if (node.children && node.children.length > 0) {
+                // Recursively search for the target node in the children
+                const newChildren = findAndReplace(node.children, targetName, replacement);
+                return { ...node, children: newChildren };
+              }
+              return node; // No replacement needed for this node
+            });
+        }
+
+        function addElementAdjacentTo(targetId, newElement, nestedArray, position) {
+            // Recursive function to traverse the nested array
+            function traverseArray(arr) {
+              for (let i = 0; i < arr.length; i++) {
+                if (arr[i].elementId === targetId) {
+                  if(position == "after") {
+                    // Add the new element after the target element
+                    arr.splice(i + 1, 0, newElement);
+                  }else if(position == "before") {
+                    // Add the new element before the target element
+                    arr.splice(i, 0, newElement);
+                  }else if(position == "inside") {
+                    // Add the new element at the end of the children array
+                    arr[i].children = arr[i].children || [];
+                    arr[i].children.push(newElement);
+                  }
+                  return;
+                }
+                if (arr[i].children && arr[i].children.length > 0) {
+                  traverseArray(arr[i].children);
+                }
+              }
+            }
+          
+            // Call the recursive function to find and add the element
+            traverseArray(nestedArray);
+        }
+
+        if(elementId) {
+            let componentPositionToAdd = api.eventPayload?.position || "after";
+            let componentData = api.eventPayload?.payload || null;
+            if(componentData) {
+                let contentItems = ctx.pageData.contents;
+                contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
+                
+                let element = api.helper.findElement(elementId, contentItems)
+                if(element) {
+                    if(componentPositionToAdd == "after") {
+                        addElementAdjacentTo(elementId, componentData, contentItems, "after");
+                    }else if(componentPositionToAdd == "before") {
+                        addElementAdjacentTo(elementId, componentData, contentItems, "before");
+                    }else if(componentPositionToAdd == "inside") {
+                        addElementAdjacentTo(elementId, componentData, contentItems, "inside");
+                    }
+
+                    ctx.pageData.contents = contentItems;
+                    let previewData = ctx.previewData || {};
+                    if(typeof previewData == "string") {
+                        previewData = JSON.parse(previewData);
+                        previewData.contents = contentItems;
+                    }else {
+                        previewData.contents = contentItems;
+                    }
+                    ctx.previewData = previewData;
+
+                    ctx.contentHistory.push(JSON.parse(JSON.stringify(contentItems)));
+                    ctx.contentHistoryIndex = ctx.contentHistoryIndex + 1;
+                    
+                    ctx.componentSettingsOpenModal = false;
+                    let currentModal = ctx.openedModals.pop();
+                    if(currentModal) {
+                        ctx[currentModal] = false;
+                    }
+                    let previousModal = ctx.openedModals.pop();
+                    if(previousModal) {
+                        ctx[previousModal] = true;
+                        ctx.openedModals.push(previousModal);
+                    }
+                    ctx.selectedComponentForSettings = "";
+
+                    return {context: ctx}
+                }
+            }
         }
     })`;
 
@@ -1108,7 +1317,7 @@ export const getPageDetails = async () => {
                                                 }
                                             },
                                             "overrides": {
-                                                "overrides": "[[api.helper.getContents(api)]]",
+                                                "overrides": "[[api.helper.getContents(api, true)]]",
                                                 "ts": "1683941616850"
                                             },
                                             "children": []
@@ -1123,17 +1332,19 @@ export const getPageDetails = async () => {
         },
         {
             "name": "PageController1",
-            "tag": "srs-controller",
             "elementId": "pageController1",
+            "tag": "srs-controller",
             "props": {
                 "handlers": [
                     {
+                        "name": "codeEditorChanged",
                         "eventName": "SrsCodeEditor#changed",
                         "type": "script",
                         "script": codeEditorChanged,
                         "stopPropagation": true
                     },
                     {
+                        "name": "selectChanged",
                         "eventName": "SrsSelect#changed",
                         "type": "script",
                         "script": selectChanged,
@@ -1316,6 +1527,20 @@ export const getPageDetails = async () => {
                         "eventName": "DESIGNTIME_ADDBLOCK_CLICKED",
                         "type": "script",
                         "script": onComponentEditBlockClicked,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "UpdateComponentData",
+                        "eventName": "UPDATE_COMPONENT_DATA",
+                        "type": "script",
+                        "script": componentDataUpdate,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "AddComponentData",
+                        "eventName": "ADD_COMPONENT_DATA",
+                        "type": "script",
+                        "script": addComponentData,
                         "stopPropagation": true
                     }
                 ]
@@ -1789,7 +2014,7 @@ export const getPageDetails = async () => {
                                 }
                             },
                             "overrides": {
-                                "overrides": "[[api.helper.getContents(api)]]",
+                                "overrides": "[[api.helper.getContents(api, false)]]",
                                 "ts": "1683941616851",
                                 "style": "[[api.helper.getPreviewContentStyles(api)]]"
                             },
@@ -1937,7 +2162,7 @@ export const getPageDetails = async () => {
                             "elementId": "componentSettingsTitle",
                             "tag": "mui-typography",
                             "props": {
-                                "text": "Component Properties",
+                                "text": "Component Settings",
                                 "color": "var(--cds-text-secondary)",
                                 "variant": "h5"
                             }
@@ -1967,148 +2192,22 @@ export const getPageDetails = async () => {
                     {
                         "name": "componentSettingsContentContainer",
                         "elementId": "componentSettingsContentContainer",
-                        "tag": "mui-grid",
+                        "tag": "mui-box",
                         "props": {
-                            "container": true
+                            
                         },
                         "children": [
                             {
-                                "name": "componentSettingsContents",
-                                "elementId": "componentSettingsContents",
-                                "tag": "mui-grid",
+                                "name": "componentSettingsContentsWidget",
+                                "tag": "srs-widget",
                                 "props": {
-                                    "item": true, 
-                                    "md": 6
+                                    "widgetcontents": componentSettingsWidgetData.contents, 
+                                    "widgetcontext": {},
+                                    "widgetfunctions": componentSettingsWidgetData.functions
                                 },
-                                "children": [
-                                    {
-                                        "name": "componentSettingsContentsTabs",
-                                        "elementId": "componentSettingsContentsTabs",
-                                        "tag": "mui-tabs",
-                                        "props": {
-                                            "value": "properties",
-                                            "sx": {
-                                                "color": "var(--cds-background-inverse)"
-                                            }
-                                        },
-                                        "children": [
-                                            {
-                                                "name": "componentSettingsTemplateTab",
-                                                "elementId": "componentSettingsTemplateTab",
-                                                "tag": "mui-tab",
-                                                "props": {
-                                                    "label": "Content Template",
-                                                    "value": "Template"
-                                                },
-                                                "children": [
-                                                    {
-                                                        "name": "componentSettingsTemplateTabContent",
-                                                        "elementId": "componentSettingsTemplateTabContent",
-                                                        "tag": "mui-typography",
-                                                        "props": {
-                                                            "text": "Content Template",
-                                                            "color": "var(--cds-text-secondary)"
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "name": "componentSettingsComponentPropsTab",
-                                                "elementId": "componentSettingsComponentPropsTab",
-                                                "tag": "mui-tab",
-                                                "props": {
-                                                    "label": "Properties",
-                                                    "value": "properties"
-                                                },
-                                                "children": [
-                                                    {
-                                                        "name": "componentSettingsComponentPropsTabContent",
-                                                        "elementId": "componentSettingsComponentPropsTabContent",
-                                                        "tag": "mui-typography",
-                                                        "props": {
-                                                            "text": "Component Properties",
-                                                            "color": "var(--cds-text-secondary)"
-                                                        }
-                                                    },
-                                                    {
-                                                        "name": "compSettings",
-                                                        "elementId": "compSettings",
-                                                        "tag": "srs-builder-componentsettings",
-                                                        "props": {
-                                                            
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "name": "componentSettingsComponentStylesTab",
-                                                "elementId": "componentSettingsComponentStylesTab",
-                                                "tag": "mui-tab",
-                                                "props": {
-                                                    "label": "Styles",
-                                                    "value": "styles"
-                                                },
-                                                "children": [
-                                                    {
-                                                        "name": "componentSettingsComponentStylesTabContent",
-                                                        "elementId": "componentSettingsComponentStylesTabContent",
-                                                        "tag": "mui-typography",
-                                                        "props": {
-                                                            "text": "Component Styles",
-                                                            "color": "var(--cds-text-secondary)"
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "componentPreviewContainer",
-                                "elementId": "componentPreviewContainer",
-                                "tag": "mui-grid",
-                                "props": {
-                                    "item": true, 
-                                    "md": 6
-                                },
-                                "children": [
-                                    {
-                                        "name": "componentPreviewContainer2",
-                                        "elementId": "componentPreviewContainer2",
-                                        "tag": "mui-box",
-                                        "props": {
-                                            "sx": {
-                                                "minHeight": "300px",
-                                                "height": "calc(100vh - 20rem)",
-                                                "maxHeight": "calc(100vh - 20rem)",
-                                                "overflow": "hidden",
-                                                "width": "50rem",
-                                                "position": "absolute",
-                                                "top": "20%"
-                                            }
-                                        },
-                                        "children": [
-                                            {
-                                                "name": "componentPreviewContentRenderer",
-                                                "tag": "srs-contentrenderer",
-                                                "props": {
-                                                    "styles": {
-                                                        "minHeight": "300px",
-                                                        "height": "calc(100vh - 20rem)",
-                                                        "maxHeight": "calc(100vh - 20rem)",
-                                                        "overflow": "auto"
-                                                    }
-                                                },
-                                                "overrides": {
-                                                    "overrides": "[[api.helper.getComponentContents(api)]]",
-                                                    "ts": "1683941616850"
-                                                },
-                                                "children": []
-                                            }
-                                        ]
-                                    }
-                                ]
+                                "overrides": {
+                                    "widgetcontext": "[[api.helper.getComponentSettingsWidgetContext(api)]]"
+                                }
                             }
                         ]
                     }]
@@ -2290,146 +2389,22 @@ export const getPageDetails = async () => {
                     {
                         "name": "componentAddContentContainer",
                         "elementId": "componentAddContentContainer",
-                        "tag": "mui-grid",
+                        "tag": "mui-box",
                         "props": {
-                            "container": true
+                            
                         },
                         "children": [
                             {
-                                "name": "componentAddContents",
-                                "elementId": "componentAddContents",
-                                "tag": "mui-grid",
+                                "name": "componentAddContentsWidget",
+                                "tag": "srs-widget",
                                 "props": {
-                                    "item": true, 
-                                    "md": 6
+                                    "widgetcontents": componentAddWidgetData.contents, 
+                                    "widgetcontext": {},
+                                    "widgetfunctions": componentAddWidgetData.functions
                                 },
-                                "children": [
-                                    {
-                                        "name": "componentAddContentsTabs",
-                                        "elementId": "componentAddContentsTabs",
-                                        "tag": "mui-tabs",
-                                        "props": {
-                                            "value": "properties",
-                                            "sx": {
-                                                "color": "var(--cds-background-inverse)"
-                                            }
-                                        },
-                                        "children": [
-                                            {
-                                                "name": "componentAddTemplateTab",
-                                                "elementId": "componentAddTemplateTab",
-                                                "tag": "mui-tab",
-                                                "props": {
-                                                    "label": "Content Template",
-                                                    "value": "Template"
-                                                },
-                                                "children": [
-                                                    {
-                                                        "name": "componentAddTemplateTabContent",
-                                                        "elementId": "componentAddTemplateTabContent",
-                                                        "tag": "mui-typography",
-                                                        "props": {
-                                                            "text": "Content Template",
-                                                            "color": "var(--cds-text-secondary)"
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "name": "componentAddComponentPropsTab",
-                                                "elementId": "componentAddComponentPropsTab",
-                                                "tag": "mui-tab",
-                                                "props": {
-                                                    "label": "Properties",
-                                                    "value": "properties"
-                                                },
-                                                "children": [
-                                                    {
-                                                        "name": "componentAddComponentPropsTabContent",
-                                                        "elementId": "componentAddComponentPropsTabContent",
-                                                        "tag": "mui-typography",
-                                                        "props": {
-                                                            "text": "Component Properties",
-                                                            "color": "var(--cds-text-secondary)"
-                                                        }
-                                                    },
-                                                    {
-                                                        "name": "compSettings",
-                                                        "elementId": "compSettings",
-                                                        "tag": "srs-builder-componentAdd",
-                                                        "props": {
-                                                            
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "name": "componentAddComponentStylesTab",
-                                                "elementId": "componentAddComponentStylesTab",
-                                                "tag": "mui-tab",
-                                                "props": {
-                                                    "label": "Styles",
-                                                    "value": "styles"
-                                                },
-                                                "children": [
-                                                    {
-                                                        "name": "componentAddComponentStylesTabContent",
-                                                        "elementId": "componentAddComponentStylesTabContent",
-                                                        "tag": "mui-typography",
-                                                        "props": {
-                                                            "text": "Component Styles",
-                                                            "color": "var(--cds-text-secondary)"
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "name": "componentPreviewContainer",
-                                "elementId": "componentPreviewContainer",
-                                "tag": "mui-grid",
-                                "props": {
-                                    "item": true, 
-                                    "md": 6
-                                },
-                                "children": [
-                                    {
-                                        "name": "componentPreviewContainer2",
-                                        "elementId": "componentPreviewContainer2",
-                                        "tag": "mui-box",
-                                        "props": {
-                                            "sx": {
-                                                "minHeight": "300px",
-                                                "height": "calc(100vh - 20rem)",
-                                                "maxHeight": "calc(100vh - 20rem)",
-                                                "overflow": "hidden",
-                                                "width": "50rem",
-                                                "position": "absolute",
-                                                "top": "20%"
-                                            }
-                                        },
-                                        "children": [
-                                            {
-                                                "name": "componentPreviewContentRenderer",
-                                                "tag": "srs-contentrenderer",
-                                                "props": {
-                                                    "styles": {
-                                                        "minHeight": "300px",
-                                                        "overflow": "auto"
-                                                    }
-                                                },
-                                                "overrides": {
-                                                    "overrides": "[[api.helper.getComponentContents(api)]]",
-                                                    "ts": "1683941616850"
-                                                },
-                                                "children": []
-                                            }
-                                        ]
-                                    }
-                                ]
+                                "overrides": {
+                                    "widgetcontext": "[[api.helper.getComponentAddWidgetContext(api)]]"
+                                }
                             }
                         ]
                     }]
@@ -2663,6 +2638,8 @@ export const getPageDetails = async () => {
         selectedComponentForAdd: "",
         selectedComponentForEditBlock: "",
         selectedComponentForSettings: "",
+        selectedComponentTypeForSettings: "",
+        selectedComponentPropData: {},
         editBlockCode: {},
         tempFunctionName: "",
         addFunctionOpenModal: false,
@@ -2682,6 +2659,8 @@ export const getPageDetails = async () => {
         screenType: "laptop",
         screenWidth: "1366px",
         screenHeight: "768px",
+        componentAddWidgetContext: componentAddWidgetData.context,
+        componentSettingsWidgetContext: componentSettingsWidgetData.context,
         pageData: {
             functions: {
                 "Item1": "(function() {})"
@@ -2691,12 +2670,12 @@ export const getPageDetails = async () => {
         }
     };
     let pageFunctions = {
-        "getContents": function(api) {
-            let result = api.context.previewData || {contents: [], context: {}, functions: {}, designtime: true};
+        "getContents": function(api, designtime) {
+            let result = api.context.previewData || {contents: [], context: {}, functions: {}, designtime};
             if(typeof result == "string") {
                 result = JSON.parse(result);
             }
-            return {...result, designtime: true};
+            return {...result, designtime};
         },
         "getPageDataContents": function(api) {
             let pageDataContents = api.context.pageData.contents || [];
@@ -2704,21 +2683,6 @@ export const getPageDetails = async () => {
                 pageDataContents = JSON.parse(pageDataContents);
             }
             return JSON.stringify(pageDataContents, null, 4);
-        },
-        "getComponentContents": function(api) {
-            return {
-                contents: [{
-                    "name": "componentToPreview",
-                    "tag": "mui-typography",
-                    "props": {
-                        "text": "hello world!",
-                        "color": "var(--cds-text-secondary)"
-                    }
-                }],
-                context: {},
-                functions: {},
-                designtime: false
-            };
         },
         "getSelectedFunctionName": function(api) {
             return [api.context.selectedFunctionName || ""];
@@ -2823,8 +2787,6 @@ export const getPageDetails = async () => {
             return JSON.stringify(editBlockCode|| {}, null, 4);
         },
         "getComponentEditBlockContents": function(api) {
-            debugger;
-
             let editBlockCode = api.context.editBlockCode || {};
             if(typeof editBlockCode == "string") {
                 editBlockCode = JSON.parse(editBlockCode);
@@ -2840,6 +2802,14 @@ export const getPageDetails = async () => {
                 functions: {},
                 designtime: false
             };
+        },
+        "getComponentSettingsWidgetContext": function(api) {
+            let ctx = {...api.context.componentSettingsWidgetContext, selectedComponentName: api.context.selectedComponentForSettings, selectedComponentType: api.context.selectedComponentTypeForSettings, componentPropData: api.context.selectedComponentPropData, componentOperation: "edit"};
+            return ctx
+        },
+        "getComponentAddWidgetContext": function(api) {
+            let ctx = {...api.context.componentAddWidgetContext, selectedComponentName: api.context.selectedComponentForAdd, selectedComponentType: api.context.selectedComponentTypeForAdd, componentOperation: "add"};
+            return ctx
         }
     };
     return {pageContents, pageContext, pageFunctions};
