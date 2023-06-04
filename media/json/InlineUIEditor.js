@@ -1,5 +1,5 @@
-import { getComponentSettingsData } from "../components/builder/GetComponentSettings";
-import { getComponentAddData } from "../components/builder/GetComponentAdd";
+import { getComponentSettingsData } from "./GetComponentSettings.js";
+import { getComponentAddData } from "./GetComponentAdd.js";
 
 const componentSettingsWidgetData = getComponentSettingsData();
 const componentAddWidgetData = getComponentAddData();
