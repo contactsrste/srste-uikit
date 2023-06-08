@@ -2,6 +2,7 @@
 export const data = [
   {
     "name": "TopContainer1",
+    "elementId": "TopContainer1",
     "tag": "srs-container",
     "props": {
       "styles": {
@@ -12,6 +13,7 @@ export const data = [
     "children": [
       {
         "name": "HeroSection1",
+        "elementId": "HeroSection1",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -28,6 +30,7 @@ export const data = [
         "children": [
           {
             "name": "HeroContainer1",
+            "elementId": "HeroContainer1",
             "tag": "srs-container",
             "props": {
               "styles": {
@@ -44,6 +47,7 @@ export const data = [
       },
       {
         "name": "ContentSection1",
+        "elementId": "ContentSection1",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -66,6 +70,7 @@ export const data = [
         "children": [
           {
             "name": "LeftContainer1",
+            "elementId": "LeftContainer1",
             "tag": "srs-container",
             "props": {
               "styles": {
@@ -82,21 +87,23 @@ export const data = [
           },
           {
             "name": "RightContainer1",
+            "elementId": "RightContainer1",
             "tag": "srs-container",
             "props": {
-              "styles": {
-              },
+              "styles": {},
               "embedded_styles": ""
             },
             "children": [
               {
                 "name": "RightContainerCardPlaceholder",
+                "elementId": "RightContainerCardPlaceholder",
                 "tag": "srs-card",
                 "props": {},
                 "children": []
               },
               {
                 "name": "RightContainerTitle1",
+                "elementId": "RightContainerTitle1",
                 "tag": "srs-richtext",
                 "props": {
                   "html_string": "<p style=\"font-size: 24px; font-weight: 600;  padding-left: 0.5rem;\">FAQs<p>"
@@ -105,11 +112,13 @@ export const data = [
               },
               {
                 "name": "RightContainerHelp1",
+                "elementId": "RightContainerHelp1",
                 "tag": "srs-accordion",
                 "props": {},
                 "children": [
                   {
                     "name": "AccordionItem1",
+                    "elementId": "AccordionItem1",
                     "tag": "srs-accordion-item",
                     "props": {
                       "title": "What is cloning?"
@@ -117,6 +126,7 @@ export const data = [
                     "children": [
                       {
                         "name": "AccordionItem1Container1",
+                        "elementId": "AccordionItem1Container1",
                         "tag": "srs-container",
                         "props": {
                           "styles": {
@@ -127,6 +137,7 @@ export const data = [
                         "children": [
                           {
                             "name": "AccordionItem1Contents1",
+                            "elementId": "AccordionItem1Contents1",
                             "tag": "srs-richtext",
                             "props": {
                               "html_string": "<p>Use the System Clone application to copy everything in a database from one instance to another. <br /><br /> Cloning is typically used to copy a production instance to a pre-production instance to test changes. Cloning data comes from the most recent, nightly backup. </p>"
@@ -139,6 +150,7 @@ export const data = [
                   },
                   {
                     "name": "AccordionItem21",
+                    "elementId": "AccordionItem21",
                     "tag": "srs-accordion-item",
                     "props": {
                       "title": "How to rollback a clone?"
@@ -146,6 +158,7 @@ export const data = [
                     "children": [
                       {
                         "name": "AccordionItem2Container1",
+                        "elementId": "AccordionItem2Container1",
                         "tag": "srs-container",
                         "props": {
                           "styles": {
@@ -156,6 +169,7 @@ export const data = [
                         "children": [
                           {
                             "name": "AccordionItem2Contents1",
+                            "elementId": "AccordionItem2Contents1",
                             "tag": "srs-richtext",
                             "props": {
                               "html_string": "<p>Use the System Clone application to copy everything in a database from one instance to another. <br /><br /> Cloning is typically used to copy a production instance to a pre-production instance to test changes. Cloning data comes from the most recent, nightly backup. </p>"
@@ -174,4 +188,4 @@ export const data = [
       }
     ]
   }
-];
+]

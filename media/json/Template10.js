@@ -2,6 +2,7 @@
 export const data = [
   {
     "name": "Container 1",
+    "elementId": "Container1",
     "tag": "srs-container",
     "props": {
       "styles": {
@@ -14,6 +15,7 @@ export const data = [
     "children": [
       {
         "name": "Container 2",
+        "elementId": "Container2",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -28,6 +30,7 @@ export const data = [
       },
       {
         "name": "Container 3",
+        "elementId": "Container3",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -42,6 +45,7 @@ export const data = [
       },
       {
         "name": "Container 4",
+        "elementId": "Container4",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -56,6 +60,7 @@ export const data = [
       },
       {
         "name": "Container 5",
+        "elementId": "Container5",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -70,6 +75,7 @@ export const data = [
       },
       {
         "name": "Container 6",
+        "elementId": "Container6",
         "tag": "srs-container",
         "props": {
           "styles": {

@@ -2,6 +2,7 @@
 export const data = [
   {
     "name": "TopContainer",
+    "elementId": "TopContainer",
     "tag": "srs-container",
     "props": {
       "styles": {
@@ -12,6 +13,7 @@ export const data = [
     "children": [
       {
         "name": "HeroSection",
+        "elementId": "HeroSection",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -28,6 +30,7 @@ export const data = [
         "children": [
           {
             "name": "HeroContainer",
+            "elementId": "HeroContainer",
             "tag": "srs-container",
             "props": {
               "styles": {
@@ -44,6 +47,7 @@ export const data = [
       },
       {
         "name": "ContentSection",
+        "elementId": "ContentSection",
         "tag": "srs-container",
         "props": {
           "styles": {
@@ -66,6 +70,7 @@ export const data = [
         "children": [
           {
             "name": "LeftContainer",
+            "elementId": "LeftContainer",
             "tag": "srs-container",
             "props": {
               "styles": {
@@ -80,6 +85,7 @@ export const data = [
             "children": [
               {
                 "name": "LeftContainerBanner1",
+                "elementId": "LeftContainerBanner1",
                 "tag": "srs-container",
                 "props": {
                   "styles": {
@@ -95,6 +101,7 @@ export const data = [
               },
               {
                 "name": "LeftContainerBanner2",
+                "elementId": "LeftContainerBanner2",
                 "tag": "srs-container",
                 "props": {
                   "styles": {
@@ -112,21 +119,23 @@ export const data = [
           },
           {
             "name": "RightContainer",
+            "elementId": "RightContainer",
             "tag": "srs-container",
             "props": {
-              "styles": {
-              },
+              "styles": {},
               "embedded_styles": ""
             },
             "children": [
               {
                 "name": "RightContainerCardPlaceholder",
+                "elementId": "RightContainerCardPlaceholder",
                 "tag": "srs-card",
                 "props": {},
                 "children": []
               },
               {
                 "name": "RightContainerTitle",
+                "elementId": "RightContainerTitle",
                 "tag": "srs-richtext",
                 "props": {
                   "html_string": "<p style=\"font-size: 24px; font-weight: 600;  padding-left: 0.5rem;\">FAQs<p>"
@@ -135,11 +144,13 @@ export const data = [
               },
               {
                 "name": "RightContainerHelp",
+                "elementId": "RightContainerHelp",
                 "tag": "srs-accordion",
                 "props": {},
                 "children": [
                   {
                     "name": "AccordionItem1",
+                    "elementId": "AccordionItem1",
                     "tag": "srs-accordion-item",
                     "props": {
                       "title": "What is cloning?"
@@ -147,6 +158,7 @@ export const data = [
                     "children": [
                       {
                         "name": "AccordionItem1Container",
+                        "elementId": "AccordionItem1Container",
                         "tag": "srs-container",
                         "props": {
                           "styles": {
@@ -157,6 +169,7 @@ export const data = [
                         "children": [
                           {
                             "name": "AccordionItem1Contents",
+                            "elementId": "AccordionItem1Contents",
                             "tag": "srs-richtext",
                             "props": {
                               "html_string": "<p>Use the System Clone application to copy everything in a database from one instance to another. <br /><br /> Cloning is typically used to copy a production instance to a pre-production instance to test changes. Cloning data comes from the most recent, nightly backup. </p>"
@@ -169,6 +182,7 @@ export const data = [
                   },
                   {
                     "name": "AccordionItem2",
+                    "elementId": "AccordionItem2",
                     "tag": "srs-accordion-item",
                     "props": {
                       "title": "How to rollback a clone?"
@@ -176,6 +190,7 @@ export const data = [
                     "children": [
                       {
                         "name": "AccordionItem2Container",
+                        "elementId": "AccordionItem2Container",
                         "tag": "srs-container",
                         "props": {
                           "styles": {
@@ -186,6 +201,7 @@ export const data = [
                         "children": [
                           {
                             "name": "AccordionItem2Contents",
+                            "elementId": "AccordionItem2Contents",
                             "tag": "srs-richtext",
                             "props": {
                               "html_string": "<p>Use the System Clone application to copy everything in a database from one instance to another. <br /><br /> Cloning is typically used to copy a production instance to a pre-production instance to test changes. Cloning data comes from the most recent, nightly backup. </p>"
@@ -204,4 +220,4 @@ export const data = [
       }
     ]
   }
-];
+]
