@@ -1,4 +1,4 @@
-import { getComponentSettingsData } from "../components/builder/GetComponentSettings";
+import { getComponentSettingsData } from "./GetComponentSettings.js";
 
 const componentSettingsWidgetData = getComponentSettingsData("edit");
 const componentAddWidgetData = getComponentSettingsData("add");
