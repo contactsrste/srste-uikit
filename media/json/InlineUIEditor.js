@@ -1,8 +1,7 @@
-import { getComponentSettingsData } from "./GetComponentSettings.js";
-import { getComponentAddData } from "./GetComponentAdd.js";
+import { getComponentSettingsData } from "../components/builder/GetComponentSettings";
 
-const componentSettingsWidgetData = getComponentSettingsData();
-const componentAddWidgetData = getComponentAddData();
+const componentSettingsWidgetData = getComponentSettingsData("edit");
+const componentAddWidgetData = getComponentSettingsData("add");
 
 export const getPageDetails = async () => {
     let onNewFnBtnClicked = `(async function() {
@@ -21,8 +20,6 @@ export const getPageDetails = async () => {
         }
     })`;
     let codeEditorChanged = `(async function() {
-        console.log(api.eventPayload);    
-        console.log(api.context);    
         let ctx = api.context || {};    
         let elementId = api.eventPayload?.payload?.id;    
         let codeEditorValue = api.eventPayload?.payload?.value || {};
@@ -590,6 +587,7 @@ export const getPageDetails = async () => {
     })`;
 
     let onComponentSettingsClicked = `(async function() {    
+        debugger;
         let ctx = api.context || {};
         let elementId = api.eventPayload?.payload?.id || "";    
         console.log("in onComponentSettingsClicked", elementId);
@@ -609,6 +607,38 @@ export const getPageDetails = async () => {
             })
         }
         ctx.selectedComponentPropData = selectedComponentPropData;
+        let selectedComponentActionHandlerData = [];
+        
+        if(matchedElement?.actionhandlers && matchedElement.actionhandlers.length > 0) {
+            matchedElement.actionhandlers.map((actionHandlerItem) => {
+                let transformedActionHandler = {
+                    actionHandlerName: actionHandlerItem.name,
+                    actionHandlerEventName: actionHandlerItem.eventName,
+                    actionHandlerType: actionHandlerItem.type
+                };
+
+                switch(actionHandlerItem.type) {
+                    case "script": 
+                        transformedActionHandler.actionHandlerScript = actionHandlerItem.script;
+                        break;
+                    case "UPDATE_CONTEXT": 
+                        transformedActionHandler.actionHandlerContextValueKey = actionHandlerItem.contextValueKey;
+                        transformedActionHandler.actionHandlerContextPath = actionHandlerItem.contextPath;
+                        transformedActionHandler.actionHandlerSourceElement = actionHandlerItem.source_elementid;
+                        break;
+                    case "relay":
+                        transformedActionHandler.actionHandlerSourceElement = actionHandlerItem.source_elementid;
+                        transformedActionHandler.actionHandlerTargetEventName = actionHandlerItem.target_eventname;
+                        transformedActionHandler.add_to_payload = actionHandlerItem.add_to_payload;
+                        break;
+                }
+
+                selectedComponentActionHandlerData.push(transformedActionHandler);
+            });
+        }
+
+        ctx.selectedComponentActionHandlerData = selectedComponentActionHandlerData;
+
         ctx.componentSettingsOpenModal = true;
         ctx.openedModals = ctx.openedModals || [];
         let currentModal = ctx.openedModals.pop();
@@ -1523,7 +1553,7 @@ export const getPageDetails = async () => {
                         "stopPropagation": true
                     },
                     {
-                        "name": "ComponentSettingsClicked",
+                        "name": "ComponentEditBlockClicked",
                         "eventName": "DESIGNTIME_ADDBLOCK_CLICKED",
                         "type": "script",
                         "script": onComponentEditBlockClicked,
@@ -1551,10 +1581,11 @@ export const getPageDetails = async () => {
             "elementId": "addFunctionModalContainer",
             "tag": "mui-modal",
             "props": {
-                "open": true
+                "open": false
             },
             "overrides": {
-                "open": "[[api.context.addFunctionOpenModal]]"
+                "open": "[[api.context.addFunctionOpenModal]]",
+                "visible": "[[api.context.addFunctionOpenModal]]"
             },
             "children": [
                 {
@@ -1654,7 +1685,8 @@ export const getPageDetails = async () => {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.removeFunctionOpenModal]]"
+                "open": "[[api.context.removeFunctionOpenModal]]",
+                "visible": "[[api.context.removeFunctionOpenModal]]"
             },
             "children": [
                 {
@@ -1752,7 +1784,8 @@ export const getPageDetails = async () => {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.editFunctionOpenModal]]"
+                "open": "[[api.context.editFunctionOpenModal]]",
+                "visible": "[[api.context.editFunctionOpenModal]]"
             },
             "children": [
                 {
@@ -1851,7 +1884,8 @@ export const getPageDetails = async () => {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.previewOpenModal]]"
+                "open": "[[api.context.previewOpenModal]]",
+                "visible": "[[api.context.previewOpenModal]]"
             },
             "children": [
                 {
@@ -2123,7 +2157,8 @@ export const getPageDetails = async () => {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.componentSettingsOpenModal]]"
+                "open": "[[api.context.componentSettingsOpenModal]]",
+                "visible": "[[api.context.componentSettingsOpenModal]]"
             },
             "children": [
                 {
@@ -2199,6 +2234,7 @@ export const getPageDetails = async () => {
                         "children": [
                             {
                                 "name": "componentSettingsContentsWidget",
+                                "elementId": "componentSettingsContentsWidget",
                                 "tag": "srs-widget",
                                 "props": {
                                     "widgetcontents": componentSettingsWidgetData.contents, 
@@ -2320,7 +2356,8 @@ export const getPageDetails = async () => {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.componentAddOpenModal]]"
+                "open": "[[api.context.componentAddOpenModal]]",
+                "visible": "[[api.context.componentAddOpenModal]]"
             },
             "children": [
                 {
@@ -2396,6 +2433,7 @@ export const getPageDetails = async () => {
                         "children": [
                             {
                                 "name": "componentAddContentsWidget",
+                                "elementId": "componentAddContentsWidget",
                                 "tag": "srs-widget",
                                 "props": {
                                     "widgetcontents": componentAddWidgetData.contents, 
@@ -2419,7 +2457,8 @@ export const getPageDetails = async () => {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.componentEditBlockOpenModal]]"
+                "open": "[[api.context.componentEditBlockOpenModal]]",
+                "visible": "[[api.context.componentEditBlockOpenModal]]"
             },
             "children": [
                 {
@@ -2640,6 +2679,7 @@ export const getPageDetails = async () => {
         selectedComponentForSettings: "",
         selectedComponentTypeForSettings: "",
         selectedComponentPropData: {},
+        selectedComponentActionHandlerData: [],
         editBlockCode: {},
         tempFunctionName: "",
         addFunctionOpenModal: false,
@@ -2804,11 +2844,15 @@ export const getPageDetails = async () => {
             };
         },
         "getComponentSettingsWidgetContext": function(api) {
-            let ctx = {...api.context.componentSettingsWidgetContext, selectedComponentName: api.context.selectedComponentForSettings, selectedComponentType: api.context.selectedComponentTypeForSettings, componentPropData: api.context.selectedComponentPropData, componentOperation: "edit"};
-            return ctx
+            debugger;
+            let ctx = {...api.context.componentSettingsWidgetContext, selectedComponentName: api.context.selectedComponentForSettings, 
+                selectedComponentType: api.context.selectedComponentTypeForSettings, componentPropData: api.context.selectedComponentPropData, 
+                actionHandlers: api.context.selectedComponentActionHandlerData, componentOperation: "edit"
+            };
+            return ctx;
         },
         "getComponentAddWidgetContext": function(api) {
-            let ctx = {...api.context.componentAddWidgetContext, selectedComponentName: api.context.selectedComponentForAdd, selectedComponentType: api.context.selectedComponentTypeForAdd, componentOperation: "add"};
+            let ctx = {...api.context.componentAddWidgetContext, selectedComponentName: api.context.selectedComponentForAdd, selectedComponentType: api.context.selectedComponentTypeForAdd, componentNameToAdd: "", componentOperation: "add"};
             return ctx
         }
     };

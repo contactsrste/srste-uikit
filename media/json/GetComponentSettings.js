@@ -1,7 +1,7 @@
-import {getComponentMetadata} from "./BuilderUtils.js";
+import {getComponentMetadata} from "./BuilderUtils";
 let componentMetaData = getComponentMetadata();
 
-export const getComponentSettingsData = function () {
+export const getComponentSettingsData = function (operation) {
 
     let linkTypeChanged = `(async function() {
         
@@ -9,6 +9,16 @@ export const getComponentSettingsData = function () {
         let ctx = api.context || {}; 
         if(elementId == "SelectedPropertyDynamicExpressionMode") {    
             ctx.selectedLinkType = api.eventPayload?.payload?.value || "Client Store";
+            return {context: ctx};
+        }
+    })`;
+
+    let componentPositionToAddChanged = `(async function() {
+        
+        let elementId = api.eventPayload?.payload?.id;   
+        let ctx = api.context || {}; 
+        if(elementId == "ComponentAddComponentPosition") {    
+            ctx.selectedComponentPosition = api.eventPayload?.payload?.value || "after";
             return {context: ctx};
         }
     })`;
@@ -96,14 +106,24 @@ export const getComponentSettingsData = function () {
                 })
             }
             if(ctx.selectedComponentName && ctx.selectedComponentType) {
+                let uniqueId = ctx.selectedComponentName + "_" + Date.now();
                 ctx.componentDataToPreview = [{
-                    "name": ctx.selectedComponentName + "_1",
-                    "elementId": ctx.selectedComponentName + "_1",
+                    "name": uniqueId,
+                    "elementId": uniqueId,
                     "tag": ctx.selectedComponentType,
                     "props": componentProps
                 }];
             }
 
+            return {context: ctx};
+        }
+    })`;
+
+    let handleComponentNameToAddChanged = `(async function() {
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id;   
+        if(elementId == "ComponentAddComponentName") {
+            ctx.componentNameToAdd = api.eventPayload?.payload?.value || "";
             return {context: ctx};
         }
     })`;
@@ -146,9 +166,10 @@ export const getComponentSettingsData = function () {
             })
         }
         if(ctx.selectedComponentName && ctx.selectedComponentType) {
+            let uniqueId = ctx.selectedComponentName + "_" + Date.now();
             ctx.componentDataToPreview = [{
-                "name": ctx.selectedComponentName + "_1",
-                "elementId": ctx.selectedComponentName + "_1",
+                "name": uniqueId,
+                "elementId": uniqueId,
                 "tag": ctx.selectedComponentType,
                 "props": componentProps
             }];
@@ -157,31 +178,143 @@ export const getComponentSettingsData = function () {
     })`;
 
     let applyComponentData = `(async function() {
-        debugger;
         let ctx = api.context || {};
+        let widgetId = api.eventPayload?.payload?.widgetId; 
         let componentProps = {};
         let componentOverrideProps = {};
         if(ctx.componentPropData && Object.keys(ctx.componentPropData).length > 0) {
-            Object.keys(ctx.componentPropData).map((propName) => {
+            Object.keys(ctx.componentPropData).map(function(propName) {
                 componentProps[propName] = ctx.componentPropData[propName]?.defaultValue;
-            })
+            });
         }
         if(ctx.componentPropData && Object.keys(ctx.componentPropData).length > 0) {
-            Object.keys(ctx.componentPropData).map((propName) => {
+            Object.keys(ctx.componentPropData).map(function(propName) {
                 if(ctx.componentPropData[propName]?.overrideValue) {
                     componentOverrideProps[propName] = ctx.componentPropData[propName]?.overrideValue;
                 }
-            })
+            });
         }
         if(ctx.selectedComponentName && ctx.selectedComponentType) {
+            let actionHandlers = ctx.actionHandlers || [];
+            let transformedActionHandlers = [];
+    
+            actionHandlers.map(function(actionHandler) {
+                let transformedActionHandler = {
+                    name: actionHandler.actionHandlerName, 
+                    eventName: actionHandler.actionHandlerEventName,
+                    type: actionHandler.actionHandlerType
+                };
+                switch(actionHandler.actionHandlerType) {
+                    case "script": 
+                        transformedActionHandler.script = actionHandler.actionHandlerScript;
+                        break;
+                    case "UPDATE_CONTEXT": 
+                        transformedActionHandler.contextValueKey = actionHandler.actionHandlerContextValueKey;
+                        transformedActionHandler.contextPath = actionHandler.actionHandlerContextPath;
+                        transformedActionHandler.source_elementid = actionHandler.actionHandlerSourceElement;
+                        break;
+                    case "relay":
+                        transformedActionHandler.source_elementid = actionHandler.actionHandlerSourceElement;
+                        transformedActionHandler.target_eventname = actionHandler.actionHandlerTargetEventName;
+                        transformedActionHandler.add_to_payload = actionHandler.add_to_payload;
+                        break;
+                }
+                transformedActionHandlers.push(transformedActionHandler);
+            });
+    
             let componentDataToUpdate = {
-                "name": ctx.selectedComponentName,
-                "elementId": ctx.selectedComponentName,
+                "name": ctx.componentOperation == "edit"? ctx.selectedComponentName: ctx.componentNameToAdd,
+                "elementId": ctx.componentOperation == "edit"? ctx.selectedComponentName: ctx.componentNameToAdd,
                 "tag": ctx.selectedComponentType,
                 "props": componentProps,
-                "overrides": componentOverrideProps 
+                "overrides": componentOverrideProps,
+                "actionhandlers": transformedActionHandlers 
             };
-            api.dispatchEvent("UPDATE_COMPONENT_DATA", {elementId: ctx.selectedComponentName, payload: componentDataToUpdate})
+            if(ctx.componentOperation == "edit" && "componentSettingsContentsWidget" == widgetId) {
+                api.dispatchEvent("UPDATE_COMPONENT_DATA", {elementId: ctx.selectedComponentName, payload: componentDataToUpdate});
+            }else if(ctx.componentOperation == "add" && "componentAddContentsWidget" == widgetId) {
+                debugger;
+                api.dispatchEvent("ADD_COMPONENT_DATA", {elementId: ctx.selectedComponentName, position: ctx.selectedComponentPosition, payload: componentDataToUpdate})
+            }
+        }
+    })`;    
+
+
+    let addNewActionHandler = `(async function() {
+        debugger;
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id;
+        ctx.actionHandlers = ctx.actionHandlers || [];
+        let duplicateActionHandler = false;
+        ctx.actionHandlers.map(function(actionHandler) {
+            if(actionHandler.actionHandlerName == ctx.newActionHandlerName) {
+                duplicateActionHandler = true;
+            }
+            actionHandler.actionHandlerOpened = false
+        });
+        if(!duplicateActionHandler){
+            ctx.actionHandlers = [{
+                "actionHandlerOpened": true,
+                "actionHandlerName": ctx.newActionHandlerName,
+                "actionHandlerEventName": ctx.newActionHandlerEventName,
+                "actionHandlerType": "script",
+                "actionHandlerScript": "(async function() {  })",
+                "actionHandlerSourceElementId": ctx.selectedComponentName,
+                "actionHandlerTargetEventName": "",
+                "actionHandlerContextPath": "",
+                "actionHandlerContextValueKey": ""
+            }].concat(ctx.actionHandlers);
+            return {context: ctx};
+        }
+    })`;
+
+    let actionHandlerDataChanged = `(async function() {
+        let ctx = api.context || {};
+        let elementId = api.eventPayload?.payload?.id;  
+        let misc = api.eventPayload?.misc || {}; 
+        let selectedHandlerName = misc.handlerName;
+        let selectedActionHandler = ctx.actionHandlers.filter((item) => item.actionHandlerName == selectedHandlerName);
+            
+        if(elementId == "actionHandlerType") {
+            if(selectedActionHandler && selectedActionHandler.length > 0) {
+                selectedActionHandler[0]["actionHandlerType"] = api.eventPayload?.payload?.value;
+            }
+            return {context: ctx};
+        }else if(elementId == "actionHandlerScript") {
+            if(selectedActionHandler && selectedActionHandler.length > 0) {
+                selectedActionHandler[0]["actionHandlerScript"] = api.eventPayload?.payload?.value;
+            }
+            return {context: ctx};
+        }else if(elementId == "actionHandlerName") {
+            if(selectedActionHandler && selectedActionHandler.length > 0) {
+                selectedActionHandler[0]["actionHandlerName"] = api.eventPayload?.payload?.value;
+            }
+            return {context: ctx};
+        }else if(elementId == "actionHandlerEventName") {
+            if(selectedActionHandler && selectedActionHandler.length > 0) {
+                selectedActionHandler[0]["actionHandlerEventName"] = api.eventPayload?.payload?.value;
+            }
+            return {context: ctx};
+        }else if(elementId == "actionHandlerSourceElement") {
+            if(selectedActionHandler && selectedActionHandler.length > 0) {
+                selectedActionHandler[0]["actionHandlerSourceElementId"] = api.eventPayload?.payload?.value;
+            }
+            return {context: ctx};
+        }else if(elementId == "actionHandlerContextPath") {
+            if(selectedActionHandler && selectedActionHandler.length > 0) {
+                selectedActionHandler[0]["actionHandlerContextPath"] = api.eventPayload?.payload?.value;
+            }
+            return {context: ctx};
+        }else if(elementId == "actionHandlerContextValueKey") {
+            if(selectedActionHandler && selectedActionHandler.length > 0) {
+                selectedActionHandler[0]["actionHandlerContextValueKey"] = api.eventPayload?.payload?.value;
+            }
+            return {context: ctx};
+        }else if(elementId == "actionHandlerTargetEventName") {
+            if(selectedActionHandler && selectedActionHandler.length > 0) {
+                selectedActionHandler[0]["actionHandlerTargetEventName"] = api.eventPayload?.payload?.value;
+            }
+            return {context: ctx};
         }
     })`;
 
@@ -193,9 +326,14 @@ export const getComponentSettingsData = function () {
         "selectedPropertyToEdit": "",
         "componentMetaData": componentMetaData || {},
         "componentPropData": {},
-        "componentOperation": "edit",
+        "componentOperation": operation || "edit",
+        "selectedComponentPosition": "after",
+        "componentNameToAdd": "",
         "selectedDynamicPropValue": "",
-        "componentDataToPreview": []
+        "componentDataToPreview": [],
+        "actionHandlers": [],
+        "newActionHandlerName": "",
+        "newActionHandlerEventName": ""
     };
     let widgetFunctions = {
         isPropertyLinkingMode: (api) => {
@@ -270,6 +408,9 @@ export const getComponentSettingsData = function () {
                 functions: {},
                 designtime: false
             };
+        },
+        getActionHandlers: function(api) {
+            return api.context.actionHandlers || [];
         }
     };
     let widgetContents = [
@@ -313,6 +454,23 @@ export const getComponentSettingsData = function () {
                             },
                             "children": [
                                 {
+                                    "name": "ComponentAddComponentName",
+                                    "elementId": "ComponentAddComponentName",
+                                    "tag": "mui-text-field",
+                                    "props": {
+                                        "label": "Name",
+                                        "variant": "outlined",
+                                        "sx": {
+                                            "color": "var(--cds-text-secondary)",
+                                            "width": "100%",
+                                            "padding": "5px"
+                                        }
+                                    },
+                                    "overrides": {
+                                        "visible": "[[api.context.componentOperation == \"add\"]]"
+                                    }
+                                },
+                                {
                                     "name": "ComponentSettingsGridContainerItem1Content1",
                                     "elementId": "ComponentSettingsGridContainerItem1Content1",
                                     "tag": "mui-auto-complete",
@@ -328,10 +486,29 @@ export const getComponentSettingsData = function () {
                                         }
                                     },
                                     "overrides": {
-                                        "options": "[[api.helper.getComponentTypes(api)]]",
+                                        "options": "[[api.helper?.getComponentTypes(api) || []]]",
                                         "selected": "[[api.context.selectedComponentType]]"
                                     },
                                     "children": []
+                                },
+                                {
+                                    "name": "ComponentAddFocussedComponentName",
+                                    "elementId": "ComponentAddFocussedComponentName",
+                                    "tag": "mui-text-field",
+                                    "props": {
+                                        "label": "Focused Element Name",
+                                        "variant": "outlined",
+                                        "disabled": true,
+                                        "sx": {
+                                            "color": "var(--cds-text-secondary)",
+                                            "width": "100%",
+                                            "padding": "5px"
+                                        }
+                                    },
+                                    "overrides": {
+                                        "visible": "[[api.context.componentOperation == \"add\"]]",
+                                        "value": "[[api.context.selectedComponentName]]"
+                                    }
                                 },
                                 {
                                     "name": "ComponentSettingsComponentName",
@@ -348,7 +525,35 @@ export const getComponentSettingsData = function () {
                                     },
                                     "overrides": {
                                         "value": "[[api.context.selectedComponentName]]",
-                                        "disabled": "[[api.context.componentOperation == \"edit\"]]"
+                                        "visible": "[[api.context.componentOperation == \"edit\"]]"
+                                    }
+                                },
+                                {
+                                    "name": "ComponentAddComponentPosition",
+                                    "elementId": "ComponentAddComponentPosition",
+                                    "tag": "mui-auto-complete",
+                                    "props": {
+                                        "label": "Position",
+                                        "displayEmpty": true,
+                                        "options": [{
+                                            "label": "Before Element",
+                                            "value": "before"
+                                        }, {
+                                            "label": "After Element",
+                                            "value": "after"
+                                        }, {
+                                            "label": "Inside Element",
+                                            "value": "inside"
+                                        }],
+                                        "selected": "after",
+                                        "sx": {
+                                            "color": "var(--cds-text-secondary)",
+                                            "width": "100%",
+                                            "padding": "5px"
+                                        }
+                                    },
+                                    "overrides": {
+                                        "visible": "[[api.context.componentOperation == \"add\"]]"
                                     }
                                 },
                                 {
@@ -817,18 +1022,506 @@ export const getComponentSettingsData = function () {
                                             "elmentId": "ComponentSettingsEventsTab",
                                             "tag": "mui-tab",
                                             "props": {
-                                                "label": "Events",
+                                                "label": "Action Handlers",
                                                 "value": "events"
                                             },
                                             "children": [
                                                 {
-                                                    "name": "tab2_content",
-                                                    "elmentId": "tab2_content",
-                                                    "tag": "mui-typography",
+                                                    "name": "ComponentSettingsEventsTabContentContainer1",
+                                                    "elementId": "ComponentSettingsEventsTabContentContainer1",
+                                                    "tag": "mui-box",
                                                     "props": {
-                                                        "text": "Events",
-                                                        "color": "var(--cds-background-inverse)"
-                                                    }
+                                                        "sx": {
+                                                            "width": "100%",
+                                                            "padding": "0px 10px"
+                                                        }
+                                                    },
+                                                    "children": [
+                                                        {
+                                                            "name": "ComponentSettingsEventsTabContentContainer2",
+                                                            "elementId": "ComponentSettingsEventsTabContentContainer2",
+                                                            "tag": "mui-box",
+                                                            "props": {
+                                                                "sx": {
+                                                                    "padding": "10px",
+                                                                    "display": "flex",
+                                                                    "justifyContent": "space-between",
+                                                                    "backgroundColor": "var(--cds-background-hover)"
+                                                                }
+                                                            },
+                                                            "children": [
+                                                                {
+                                                                    "name": "ComponentSettingsEventsTabHeader",
+                                                                    "elementId": "ComponentSettingsEventsTabHeader",
+                                                                    "tag": "mui-typography",
+                                                                    "props": {
+                                                                        "text": "Action Handlers",
+                                                                        "sx": {
+                                                                            "backgroundColor": "var(--cds-background-hover)",
+                                                                            "color": "var(--cds-text-secondary)",
+                                                                            "width": "100%",
+                                                                            "paddingTop": "10px",
+                                                                            "paddingLeft": "5px"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "name": "newActionHandlerContents",
+                                                                    "elementId": "newActionHandlerContents",
+                                                                    "tag": "mui-box",
+                                                                    "props": {
+                                                                        "sx": {
+                                                                            "backgroundColor": "var(--cds-background-hover)",
+                                                                            "color": "var(--cds-text-secondary)",
+                                                                            "width": "100%",
+                                                                            "paddingTop": "10px",
+                                                                            "paddingLeft": "5px",
+                                                                            "display": "flex",
+                                                                            "flexDirection": "row"
+        
+                                                                        }
+                                                                    },
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "newActionHandlerName",
+                                                                            "elementId": "newActionHandlerName",
+                                                                            "tag": "mui-text-field",
+                                                                            "props": {
+                                                                                "label": "Handler Name",
+                                                                                "variant": "outlined",
+                                                                                "actionhandlers": [
+                                                                                    {
+                                                                                        "name": "updateNewActionHandlerName",
+                                                                                        "type": "UPDATE_CONTEXT",
+                                                                                        "eventName": "MuiTextField#changed",
+                                                                                        "contextPath": "newActionHandlerName",
+                                                                                        "contextValueKey": "value"
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            "overrides": {
+                                                                                "value": "[[api.context.newActionHandlerName]]"
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "name": "newActionHandlerEventName",
+                                                                            "elementId": "newActionHandlerEventName",
+                                                                            "tag": "mui-text-field",
+                                                                            "props": {
+                                                                                "label": "Event Name",
+                                                                                "variant": "outlined",
+                                                                                "actionhandlers": [
+                                                                                    {
+                                                                                        "name": "updateNewActionHandlerEventName",
+                                                                                        "type": "UPDATE_CONTEXT",
+                                                                                        "eventName": "MuiTextField#changed",
+                                                                                        "contextPath": "newActionHandlerEventName",
+                                                                                        "contextValueKey": "value"
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            "overrides": {
+                                                                                "value": "[[api.context.newActionHandlerEventName]]"
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "name": "newActionHandlerPopoverActions",
+                                                                            "elementId": "newActionHandlerPopoverActions",
+                                                                            "tag": "mui-box",
+                                                                            "props": {
+                                                                                "sx": {
+                                                                                    "display": "flex",
+                                                                                    "flexDirection": "row",
+                                                                                    "justifyContent": "flex-end",
+                                                                                    "padding": "5px"
+                                                                                }
+                                                                            },
+                                                                            "children": [
+                                                                                {
+                                                                                    "name": "newActionHandlerActionApply",
+                                                                                    "elementId": "newActionHandlerActionApply",
+                                                                                    "tag": "mui-button",
+                                                                                    "props": {
+                                                                                        "label": "ADD",
+                                                                                        "actionhandlers": [
+                                                                                            {
+                                                                                                "name": "createNewActionHandler",
+                                                                                                "type": "relay",
+                                                                                                "eventName": "SrsMuiButton#clicked",
+                                                                                                "source_elementid": "newActionHandlerActionApply",
+                                                                                                "target_eventname": "CreateNewActionHandlerForComponentSettings"
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "eventHandlerRepeater",
+                                                            "elementId": "eventHandlerRepeater",
+                                                            "tag": "srs-repeater",
+                                                            "props": {
+                                                                "items": [],
+                                                                "sx": {
+                                                                    "overflow": "auto",
+                                                                    "display": "flex",
+                                                                    "height": "calc(100vh - 25rem)",
+                                                                    "flexDirection": "column"
+                                                                }
+                                                            },
+                                                            "overrides": {
+                                                                "items": "[[api.helper.getActionHandlers(api)]]"
+                                                            },
+                                                            "children": [
+                                                                {
+                                                                    "name": "eventHandlerAccordion",
+                                                                    "elementId": "eventHandlerAccordion",
+                                                                    "tag": "mui-accordion",
+                                                                    "props": {
+                                                                        "expanded": false,
+                                                                        "sx": {
+                                                                            "width": "100%"
+                                                                        }
+                                                                    },
+                                                                    "overrides": {
+                                                                        "expanded": "[[api.context.actionHandlerOpened]]"
+                                                                    },
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "eventHandlerBox",
+                                                                            "elementId": "eventHandlerBox",
+                                                                            "tag": "mui-box",
+                                                                            "props": {
+                                                                                "slotname": "accordion_summary"
+                                                                            },
+                                                                            "children": [
+                                                                                {
+                                                                                    "name": "actionHandlerSummary",
+                                                                                    "elementId": "actionHandlerSummary",
+                                                                                    "tag": "mui-typography",
+                                                                                    "props": {
+                                                                                        "text": "Action Handler 1",
+                                                                                        "sx": {
+                                                                                            "color": "var(--cds-text-secondary)"
+                                                                                        }
+                                                                                    },
+                                                                                    "overrides": {
+                                                                                        "text": "[[api.context.actionHandlerName]]"
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "name": "actionHandlerDetailBox",
+                                                                            "elementId": "actionHandlerDetailBox",
+                                                                            "tag": "mui-box",
+                                                                            "props": {
+                                                                                "slotname": "accordion_details",
+                                                                                "sx": {
+                                                                                    "width": "100%"
+                                                                                }
+                                                                            },
+                                                                            "children": [
+                                                                                {
+                                                                                    "name": "actionHandlerGrid",
+                                                                                    "elementId": "actionHandlerGrid",
+                                                                                    "tag": "mui-grid",
+                                                                                    "props": {
+                                                                                        "container": true,
+                                                                                        "sx": {
+                                                                                            "width": "100%"
+                                                                                        }
+                                                                                    },
+                                                                                    "children": [
+                                                                                        {
+                                                                                            "name": "actionHandlerGridItem1",
+                                                                                            "elementId": "actionHandlerGridItem1",
+                                                                                            "tag": "mui-grid",
+                                                                                            "props": {
+                                                                                                "item": true,
+                                                                                                "md": 12
+                                                                                            },
+                                                                                            "children": [
+                                                                                                {
+                                                                                                    "name": "actionHandlerName",
+                                                                                                    "elementId": "actionHandlerName",
+                                                                                                    "tag": "mui-text-field",
+                                                                                                    "props": {
+                                                                                                        "label": "Name",
+                                                                                                        "variant": "outlined",
+                                                                                                        "sx": {
+                                                                                                            "color": "var(--cds-text-secondary)",
+                                                                                                            "width": "100%",
+                                                                                                            "martinTop": "5px"
+                                                                                                        },
+                                                                                                        "actionhandlers": [
+                                                                                                            {
+                                                                                                                "name": "actionHandlerNameChanged",
+                                                                                                                "eventName": "MuiTextField#changed",
+                                                                                                                "type": "script",
+                                                                                                                "script": actionHandlerDataChanged,
+                                                                                                                "stopPropagation": true
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    },
+                                                                                                    "overrides": {
+                                                                                                        "value": "[[api.context.actionHandlerName]]",
+                                                                                                        "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]"
+                                                                                                    }
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "actionHandlerGridItem3",
+                                                                                            "elementId": "actionHandlerGridItem3",
+                                                                                            "tag": "mui-grid",
+                                                                                            "props": {
+                                                                                                "item": true,
+                                                                                                "md": 12
+                                                                                            },
+                                                                                            "children": [
+                                                                                                {
+                                                                                                    "name": "actionHandlerGridItem2Container",
+                                                                                                    "elementId": "actionHandlerGridItem2Container",
+                                                                                                    "tag": "srs-container",
+                                                                                                    "props": {
+                                                                                                        "styles": {
+                                                                                                            "display": "flex",
+                                                                                                            "flexDirection": "column",
+                                                                                                            "justifyContent": "flex-start",
+                                                                                                            "width": "100%"
+                                                                                                        }
+                                                                                                    },
+                                                                                                    "children": [
+                                                                                                        {
+                                                                                                            "name": "actionHandlerEventName",
+                                                                                                            "elementId": "actionHandlerEventName",
+                                                                                                            "tag": "mui-text-field",
+                                                                                                            "props": {
+                                                                                                                "label": "Event Name",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerEventNameChanged",
+                                                                                                                        "eventName": "MuiTextField#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "value": "[[api.context.actionHandlerEventName]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerType",
+                                                                                                            "elementId": "actionHandlerType",
+                                                                                                            "tag": "mui-auto-complete",
+                                                                                                            "props": {
+                                                                                                                "options": [
+                                                                                                                    {
+                                                                                                                        "label": "UPDATE_CONTEXT", 
+                                                                                                                        "value": "UPDATE_CONTEXT"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "label": "Script", 
+                                                                                                                        "value": "script"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "label": "Relay", 
+                                                                                                                        "value": "relay"
+                                                                                                                    }
+                                                                                                                ],
+                                                                                                                "selected": "script",
+                                                                                                                "sx": {
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerTypeChanged",
+                                                                                                                        "eventName": "SrsMuiSelect#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "selected": "[[api.context.actionHandlerType]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerScript",
+                                                                                                            "elementId": "actionHandlerScript",
+                                                                                                            "tag": "srs-codeeditor",
+                                                                                                            "props": {
+                                                                                                                "label": "Script",
+                                                                                                                "language": "javascript",
+                                                                                                                "height": "calc(100vh - 60rem)",
+                                                                                                                "width": "40vw",
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerScriptChanged",
+                                                                                                                        "eventName": "SrsCodeEditor#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"script\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerScript]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerSourceElement",
+                                                                                                            "elementId": "actionHandlerSourceElement",
+                                                                                                            "tag": "mui-text-field",
+                                                                                                            "props": {
+                                                                                                                "label": "Source Element Id",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerSourceElementChanged",
+                                                                                                                        "eventName": "MuiTextField#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"relay\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerSourceElementId]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerTargetEventName",
+                                                                                                            "elementId": "actionHandlerTargetEventName",
+                                                                                                            "tag": "mui-text-field",
+                                                                                                            "props": {
+                                                                                                                "label": "Target Event Name",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerTargetEventChanged",
+                                                                                                                        "eventName": "MuiTextField#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"relay\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerTargetEventName]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerContextPath",
+                                                                                                            "elementId": "actionHandlerContextPath",
+                                                                                                            "tag": "mui-text-field",
+                                                                                                            "props": {
+                                                                                                                "label": "Context Path",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerContextPathChanged",
+                                                                                                                        "eventName": "MuiTextField#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"UPDATE_CONTEXT\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerContextPath]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerContextValueKey",
+                                                                                                            "elementId": "actionHandlerContextValueKey",
+                                                                                                            "tag": "mui-text-field",
+                                                                                                            "props": {
+                                                                                                                "label": "Target Event Name",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerContextValueKeyChanged",
+                                                                                                                        "eventName": "MuiTextField#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"UPDATE_CONTEXT\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerContextValueKey]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         }
@@ -931,6 +1624,7 @@ export const getComponentSettingsData = function () {
                                     "children": [
                                         {
                                             "name": "componentPreviewContentRenderer",
+                                            "elementId": "componentPreviewContentRenderer",
                                             "tag": "srs-contentrenderer",
                                             "props": {
                                                 "styles": {
@@ -941,8 +1635,7 @@ export const getComponentSettingsData = function () {
                                                 }
                                             },
                                             "overrides": {
-                                                "overrides": "[[api.helper.getComponentContents(api)]]",
-                                                "ts": "1683941616850"
+                                                "overrides": "[[api.helper?.getComponentContents(api) || []]]"
                                             },
                                             "children": []
                                         }
@@ -965,6 +1658,13 @@ export const getComponentSettingsData = function () {
                         "eventName": "SrsMuiSelect#changed",
                         "type": "script",
                         "script": linkTypeChanged,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "componentPositionToAddChanged",
+                        "eventName": "SrsMuiSelect#changed",
+                        "type": "script",
+                        "script": componentPositionToAddChanged,
                         "stopPropagation": true
                     },
                     {
@@ -1003,6 +1703,13 @@ export const getComponentSettingsData = function () {
                         "stopPropagation": true
                     },
                     {
+                        "name": "handleComponentNameToAddChanged",
+                        "eventName": "MuiTextField#changed",
+                        "type": "script",
+                        "script": handleComponentNameToAddChanged,
+                        "stopPropagation": true
+                    },
+                    {
                         "name": "handlePropertyOverrideValueChanged",
                         "eventName": "MuiTextField#changed",
                         "type": "script",
@@ -1028,6 +1735,13 @@ export const getComponentSettingsData = function () {
                         "eventName": "APPLY_COMPONENT_DATA",
                         "type": "script",
                         "script": applyComponentData,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "createNewActionHandlerForComponentSettings",
+                        "eventName": "CreateNewActionHandlerForComponentSettings",
+                        "type": "script",
+                        "script": addNewActionHandler,
                         "stopPropagation": true
                     }
                 ]
