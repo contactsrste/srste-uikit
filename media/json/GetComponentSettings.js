@@ -1635,7 +1635,7 @@ export const getComponentSettingsData = function (operation) {
                                                 }
                                             },
                                             "overrides": {
-                                                "overrides": "[[api.helper?.getComponentContents(api) || []]]"
+                                                "overrides": "[[api.helper?.getComponentContents(api)]]"
                                             },
                                             "children": []
                                         }

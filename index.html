@@ -102,20 +102,23 @@
                 <a href="?page=BuildingExperiences" class="w3-bar-item w3-button">Building Experiences</a>
                 <a href="?page=CreatingPages" class="w3-bar-item w3-button">Creating Pages</a>
                 <a href="?page=CreatingContentTypes" class="w3-bar-item w3-button">Creating Content Types</a>
-                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>
+                <a href="?page=Editor" class="w3-bar-item w3-button">UI Editor</a>`;
         } else if (page == "GettingStarted") {
             sidebarEl.innerHTML = `
                 <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
                 <a href="?page=BuildingExperiences" class="w3-bar-item w3-button">Building Experiences</a>
                 <a href="?page=CreatingPages" class="w3-bar-item w3-button">Creating Pages</a>
                 <a href="?page=CreatingContentTypes" class="w3-bar-item w3-button">Creating Content Types</a>
-                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>
+                <a href="?page=Editor" class="w3-bar-item w3-button">UI Editor</a>`;
         } else if (page == "BuildingExperiences") {
             sidebarEl.innerHTML = `
                 <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
                 <a href="?page=Setup" class="w3-bar-item w3-button">Setup</a>
                 <a href="?page=Configurations" class="w3-bar-item w3-button">Configurations</a>                
-                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>
+                <a href="?page=Editor" class="w3-bar-item w3-button">UI Editor</a>`;
         } else if (page == "CreatingPages") {
             sidebarEl.innerHTML = `
                 <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
@@ -129,7 +132,8 @@
                 <a href="?page=ClientScriptingAPI" class="w3-bar-item w3-button">Client Scripting API</a>
                 <a href="?page=ClientContext" class="w3-bar-item w3-button">Client Context</a>
                 <a href="?page=DataFlows" class="w3-bar-item w3-button">Data Flows</a>
-                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>
+                <a href="?page=Editor" class="w3-bar-item w3-button">UI Editor</a>`;
         } else if (page == "CreatingContentTypes") {
             sidebarEl.innerHTML = `
                 <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
@@ -138,7 +142,8 @@
                 <a href="?page=CustomType" class="w3-bar-item w3-button">Custom Content Type</a>
                 <a href="?page=GenericBlock" class="w3-bar-item w3-button">Generic Block</a>
                 <a href="?page=DataBlock" class="w3-bar-item w3-button">Data Block</a>
-                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>
+                <a href="?page=Editor" class="w3-bar-item w3-button">UI Editor</a>`;
         } else if (page == "RuntimeExperience") {
             sidebarEl.innerHTML = `
                 <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
@@ -146,17 +151,21 @@
                 <a href="?page=CachingPerformance" class="w3-bar-item w3-button">Caching & Performance</a>
                 <a href="?page=Translations" class="w3-bar-item w3-button">Translations</a>
                 <a href="?page=Telemetry" class="w3-bar-item w3-button">Telemetry</a>
-                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>
+                <a href="?page=Editor" class="w3-bar-item w3-button">UI Editor</a>`;
         } else {
             sidebarEl.innerHTML = `
                 <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
-                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>`;
+                <a href="?page=Templates" class="w3-bar-item w3-button">Templates</a>
+                <a href="?page=Editor" class="w3-bar-item w3-button">UI Editor</a>`;
         }
 
         if (page == "Templates") {
             loadTemplates();
             showEditor(false)
-        } else {
+        } else if(page == "Editor") {
+            showEditor(true);
+        }else {
             showEditor(false);
         }
     }
