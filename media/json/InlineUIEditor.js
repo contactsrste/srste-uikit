@@ -969,46 +969,6 @@ export const getPageDetails = async () => {
             },
             "children": [
                 {
-                    "name": "HeroSection",
-                    "tag": "srs-container",
-                    "props": {
-                        "styles": {
-                            "background-image": "",
-                            "background-size": "cover",
-                            "padding": "2rem",
-                            "min-height": "50px",
-                            "color": "#fff",
-                            "placeContent": "start",
-                            "backgroundColor": "#0c0326"
-                        },
-                        "embedded_styles": ""
-                    },
-                    "children": [
-                        {
-                            "name": "HeroContainer",
-                            "tag": "srs-container",
-                            "props": {
-                                "styles": {
-                                    "backgroundColor": "var(--cds-background-hover)",
-                                    "minHeight": 25,
-                                    "minWidth": "80%"
-                                },
-                                "embedded_styles": ""
-                            },
-                            "children": [
-                                {
-                                    "name": "Hero Title",
-                                    "tag": "srs-richtext",
-                                    "props": {
-                                        "html_string": "<h3>UI Editor</h3>"
-                                    },
-                                    "children": []
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
                     "name": "ActionContainer",
                     "tag": "srs-container",
                     "props": {
