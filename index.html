@@ -173,12 +173,16 @@
     async function showEditor(showFlag, el) {
         let imagesContainer = document.querySelector(".imagesContainer");
         let editorNode = document.querySelector("#__srsteroot__");
+        let templateCategoriesEl = document.querySelector(".templateCategories");
+
         if (showFlag) {
             imagesContainer.style.display = "none";
             editorNode.style.display = "";
+            templateCategoriesEl.style.display = "block";
         } else {
             imagesContainer.style.display = "";
             editorNode.style.display = "none";
+            templateCategoriesEl.style.display = "none";
         }
         if (el) {
             let templateCategoryEls = document.querySelectorAll(".templateCategory");

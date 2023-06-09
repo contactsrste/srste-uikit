@@ -87,6 +87,7 @@
 .templateCategories {
     display: flex;
     flex-direction: row;
+    display: none;
     margin-top: 10px;
     margin-bottom: 5px;
 }
