@@ -94,9 +94,20 @@ export const getComponentSettingsData = function (operation) {
         if(elementId == "propertyDefaultValue") {
             let misc = api.eventPayload?.misc || {};
             let selectedPropName = misc.propName;
+            let selectedPropType = misc.propType;
+
             let componentPropData = ctx.componentPropData || {};
             componentPropData[selectedPropName] = componentPropData[selectedPropName] || {};
-            componentPropData[selectedPropName]["defaultValue"] = api.eventPayload?.payload?.value || "";
+            if(selectedPropType == "string") {
+                componentPropData[selectedPropName]["defaultValue"] = api.eventPayload?.payload?.value || "";
+            }else if(selectedPropType == "object") {
+                componentPropData[selectedPropName]["defaultValue"] = api.eventPayload?.payload?.value || {};
+            }else if(selectedPropType == "boolean") {
+                componentPropData[selectedPropName]["defaultValue"] = api.eventPayload?.payload?.value || false;
+            }else if(selectedPropType == "styles") {
+                componentPropData[selectedPropName]["defaultValue"] = api.eventPayload?.payload?.styles || {};
+            }
+            
             ctx.componentPropData = componentPropData;
             
             let componentProps = {};
@@ -707,8 +718,48 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                 }
                                                                                                             },
                                                                                                             "overrides": {
+                                                                                                                "visible": "[[api.context.propType == \"string\"]]",
                                                                                                                 "value": "[[api.context.propDefaultValue]]",
-                                                                                                                "misc": "[[{\"propName\": api.context.propName}]]"
+                                                                                                                "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "propertyDefaultValue",
+                                                                                                            "tag": "srs-toggle",
+                                                                                                            "props": {
+                                                                                                                "label": "Default Value"
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.propType == \"boolean\"]]",
+                                                                                                                "value": "[[api.context.propDefaultValue]]",
+                                                                                                                "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "propertyDefaultValue",
+                                                                                                            "tag": "srs-codeeditor",
+                                                                                                            "props": {
+                                                                                                                "label": "Default Value",
+                                                                                                                "language": "json",
+                                                                                                                "height": "300px",
+                                                                                                                "width": "400px"
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.propType == \"object\"]]",
+                                                                                                                "value": "[[api.context.propDefaultValue]]",
+                                                                                                                "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "propertyDefaultValue",
+                                                                                                            "tag": "srs-stylecontainer",
+                                                                                                            "props": {
+                                                                                                                "styles": {}
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.propType == \"styles\"]]",
+                                                                                                                "styles": "[[api.context.propDefaultValue]]",
+                                                                                                                "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
                                                                                                             }
                                                                                                         }
                                                                                                     ]
@@ -748,7 +799,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                     },
                                                                                                                     "overrides": {
                                                                                                                         "value": "[[api.context.propDynamicValue]]",
-                                                                                                                        "misc": "[[{\"propName\": api.context.propName}]]"
+                                                                                                                        "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
                                                                                                                     }
                                                                                                                 },
                                                                                                                 {
@@ -759,7 +810,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                         "icon": "AddLink"
                                                                                                                     },
                                                                                                                     "overrides": {
-                                                                                                                        "misc": "[[{\"propName\": api.context.propName}]]"
+                                                                                                                        "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
                                                                                                                     }
                                                                                                                 },
                                                                                                                 {
@@ -770,7 +821,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                         "icon": "LinkOff"
                                                                                                                     },
                                                                                                                     "overrides": {
-                                                                                                                        "misc": "[[{\"propName\": api.context.propName}]]"
+                                                                                                                        "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
                                                                                                                     }
                                                                                                                 }
                                                                                                             ]
@@ -1696,8 +1747,22 @@ export const getComponentSettingsData = function (operation) {
                         "stopPropagation": true
                     },
                     {
-                        "name": "handlePropertyDefaultValueChanged",
+                        "name": "handleTextPropertyDefaultValueChanged",
                         "eventName": "MuiTextField#changed",
+                        "type": "script",
+                        "script": handlePropertyDefaultValueChanged,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "handleBooleanPropertyDefaultValueChanged",
+                        "eventName": "SrsToggle#changed",
+                        "type": "script",
+                        "script": handlePropertyDefaultValueChanged,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "handleStylePropertyDefaultValueChanged",
+                        "eventName": "STYLES_UPDATED",
                         "type": "script",
                         "script": handlePropertyDefaultValueChanged,
                         "stopPropagation": true

@@ -36,7 +36,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -52,7 +52,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -98,7 +98,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -144,7 +144,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -200,7 +200,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -236,7 +236,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -287,7 +287,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -346,7 +346,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -382,7 +382,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -433,7 +433,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -449,7 +449,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -495,7 +495,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -558,10 +558,15 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
-            "events": [],
+            "events": [
+                {
+                    "name": "SrsMuiButton#clicked",
+                    "payload": {}
+                }
+            ],
             "slots": [
                 {
                     "name": "default",
@@ -589,7 +594,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -635,7 +640,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -671,7 +676,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -697,7 +702,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -718,7 +723,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -734,7 +739,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -765,7 +770,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -806,7 +811,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -852,7 +857,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -898,7 +903,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -954,7 +959,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -990,7 +995,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1021,7 +1026,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1042,7 +1047,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1129,7 +1134,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1150,7 +1155,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1171,7 +1176,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1212,7 +1217,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1243,7 +1248,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1269,7 +1274,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1305,7 +1310,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1341,7 +1346,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1392,7 +1397,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1433,7 +1438,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1464,7 +1469,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1489,7 +1494,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1540,7 +1545,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1661,7 +1666,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1702,7 +1707,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [
@@ -1747,7 +1752,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1780,7 +1785,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1821,7 +1826,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1867,7 +1872,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1893,7 +1898,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1929,7 +1934,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -1965,7 +1970,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2001,7 +2006,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2047,7 +2052,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2078,7 +2083,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2119,7 +2124,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2140,7 +2145,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2176,7 +2181,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2197,7 +2202,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2218,7 +2223,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2244,7 +2249,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2275,7 +2280,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2306,7 +2311,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2332,7 +2337,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2383,7 +2388,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2424,7 +2429,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [
@@ -2463,7 +2468,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2557,7 +2562,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2598,7 +2603,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2639,7 +2644,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2681,7 +2686,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2717,7 +2722,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2753,7 +2758,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2784,7 +2789,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2820,7 +2825,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2836,7 +2841,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2877,7 +2882,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2918,7 +2923,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -2969,7 +2974,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3023,7 +3028,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3049,7 +3054,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3090,7 +3095,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3131,7 +3136,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3157,7 +3162,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3193,7 +3198,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3229,7 +3234,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3275,7 +3280,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3326,7 +3331,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3367,7 +3372,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3408,7 +3413,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3459,7 +3464,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3495,7 +3500,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3531,7 +3536,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3592,7 +3597,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3628,7 +3633,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3674,7 +3679,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3705,7 +3710,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3726,7 +3731,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3762,7 +3767,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3783,7 +3788,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3805,7 +3810,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ]
         },
@@ -3819,7 +3824,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3865,7 +3870,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3891,7 +3896,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -3934,7 +3939,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -4000,7 +4005,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -4078,7 +4083,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -4116,7 +4121,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -4157,7 +4162,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -4185,7 +4190,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -4241,7 +4246,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],
@@ -4312,7 +4317,7 @@ export const getComponentMetadata = () => {
                 {
                     "name": "sx",
                     "defaultValue": {},
-                    "type": "object"
+                    "type": "styles"
                 }
             ],
             "events": [],

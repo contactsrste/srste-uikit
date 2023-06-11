@@ -969,6 +969,46 @@ export const getPageDetails = async () => {
             },
             "children": [
                 {
+                    "name": "HeroSection",
+                    "tag": "srs-container",
+                    "props": {
+                        "styles": {
+                            "background-image": "",
+                            "background-size": "cover",
+                            "padding": "2rem",
+                            "min-height": "50px",
+                            "color": "#fff",
+                            "placeContent": "start",
+                            "backgroundColor": "#0c0326"
+                        },
+                        "embedded_styles": ""
+                    },
+                    "children": [
+                        {
+                            "name": "HeroContainer",
+                            "tag": "srs-container",
+                            "props": {
+                                "styles": {
+                                    "backgroundColor": "var(--cds-background-hover)",
+                                    "minHeight": 25,
+                                    "minWidth": "80%"
+                                },
+                                "embedded_styles": ""
+                            },
+                            "children": [
+                                {
+                                    "name": "Hero Title",
+                                    "tag": "srs-richtext",
+                                    "props": {
+                                        "html_string": "<h3>UI Editor</h3>"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
                     "name": "ActionContainer",
                     "tag": "srs-container",
                     "props": {
@@ -1541,7 +1581,7 @@ export const getPageDetails = async () => {
             "elementId": "addFunctionModalContainer",
             "tag": "mui-modal",
             "props": {
-                "open": false
+                "open": true
             },
             "overrides": {
                 "open": "[[api.context.addFunctionOpenModal]]",
@@ -2805,14 +2845,33 @@ export const getPageDetails = async () => {
         },
         "getComponentSettingsWidgetContext": function(api) {
             debugger;
+            let componentProps = {};
+            let componentDataToPreview = [];
+            let componentPropData = api.context.selectedComponentPropData || {};
+            if(componentPropData && Object.keys(componentPropData).length > 0) {
+                Object.keys(componentPropData).map((propName) => {
+                    componentProps[propName] = componentPropData[propName]?.defaultValue;
+                })
+            }
+            if(api.context.selectedComponentForSettings && api.context.selectedComponentTypeForSettings) {
+                let uniqueId = api.context.selectedComponentForSettings + "_" + Date.now();
+                componentDataToPreview = [{
+                    "name": uniqueId,
+                    "elementId": uniqueId,
+                    "tag": api.context.selectedComponentTypeForSettings,
+                    "props": componentProps
+                }];
+            }
+
             let ctx = {...api.context.componentSettingsWidgetContext, selectedComponentName: api.context.selectedComponentForSettings, 
                 selectedComponentType: api.context.selectedComponentTypeForSettings, componentPropData: api.context.selectedComponentPropData, 
-                actionHandlers: api.context.selectedComponentActionHandlerData, componentOperation: "edit"
+                actionHandlers: api.context.selectedComponentActionHandlerData, componentOperation: "edit", componentDataToPreview
             };
             return ctx;
         },
         "getComponentAddWidgetContext": function(api) {
-            let ctx = {...api.context.componentAddWidgetContext, selectedComponentName: api.context.selectedComponentForAdd, selectedComponentType: api.context.selectedComponentTypeForAdd, componentNameToAdd: "", componentOperation: "add"};
+            let ctx = {...api.context.componentAddWidgetContext, selectedComponentName: api.context.selectedComponentForAdd, 
+                selectedComponentType: api.context.selectedComponentTypeForAdd, componentNameToAdd: "", componentOperation: "add"};
             return ctx
         }
     };
