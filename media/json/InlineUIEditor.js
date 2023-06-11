@@ -65,6 +65,18 @@ export const getPageDetails = async () => {
             ctx.contentHistory.push(pageContents);
             ctx.contentHistoryIndex = ctx.contentHistoryIndex + 1;
             return {context: ctx};
+        }else if(elementId == "OpenPreview") {    
+            let pageData = ctx.pageData || "{}";
+            pageData = typeof ctx.pageData == "string"? JSON.parse(pageData): pageData;    
+            let pageContents = pageData?.contents || [];
+            pageContents = typeof pageContents == "string"? JSON.parse(pageContents): pageContents;    
+            let pageContext = pageData?.context || {};    
+            pageContext = typeof pageContext == "string"? JSON.parse(pageContext): pageContext;    
+            let pageFunctions = pageData?.functions || {};    
+            pageFunctions = typeof pageFunctions == "string"? JSON.parse(pageFunctions): pageFunctions;  
+            let previewData = JSON.stringify({contents: pageContents, context: pageContext, functions: pageFunctions});
+            localStorage.setItem("srsPageData", api.helper.compress(previewData));
+            window.open("/pagepreview", "Preview");
         }
         
     })`;
@@ -120,7 +132,7 @@ export const getPageDetails = async () => {
     }
 </script>`;
 
-    let getEmbeddedCodeExpression = `data.template.replace('$$contents$$', JSON.stringify(data.contents)).replace('$$context$$', JSON.stringify(data.context, null, 4)).replace('$$functions$$', JSON.stringify(data.functions, null, 4))`;
+    let getEmbeddedCodeExpression = `data.template.replaceAll('$$contents$$', JSON.stringify(data.contents)).replaceAll('$$context$$', JSON.stringify(data.context, null, 4)).replaceAll('$$functions$$', JSON.stringify(data.functions, null, 4))`;
 
     let showEmbedCodeClicked = `(async function() {
        
@@ -1019,6 +1031,14 @@ export const getPageDetails = async () => {
                         }
                     },
                     "children": [
+                        {
+                            "name": "OpenPreview",
+                            "elementId": "OpenPreview",
+                            "tag": "mui-icon-button",
+                            "props": {
+                                "icon": "Preview"
+                            }
+                        },
                         {
                             "name": "UpdatePreview",
                             "elementId": "UpdatePreview",
