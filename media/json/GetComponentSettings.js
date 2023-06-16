@@ -107,7 +107,7 @@ export const getComponentSettingsData = function (operation) {
             }else if(selectedPropType == "styles") {
                 componentPropData[selectedPropName]["defaultValue"] = api.eventPayload?.payload?.styles || {};
             }
-            
+
             ctx.componentPropData = componentPropData;
             
             let componentProps = {};
@@ -117,7 +117,7 @@ export const getComponentSettingsData = function (operation) {
                 })
             }
             if(ctx.selectedComponentName && ctx.selectedComponentType) {
-                let uniqueId = ctx.selectedComponentName + "_" + Date.now();
+                let uniqueId = ctx.selectedComponentName + "_1";
                 ctx.componentDataToPreview = [{
                     "name": uniqueId,
                     "elementId": uniqueId,
@@ -177,13 +177,14 @@ export const getComponentSettingsData = function (operation) {
             })
         }
         if(ctx.selectedComponentName && ctx.selectedComponentType) {
-            let uniqueId = ctx.selectedComponentName + "_" + Date.now();
+            let uniqueId = ctx.selectedComponentName + "_1";
             ctx.componentDataToPreview = [{
                 "name": uniqueId,
                 "elementId": uniqueId,
                 "tag": ctx.selectedComponentType,
                 "props": componentProps
             }];
+            ctx.componentDataToPreviewTs = uniqueId;
         }
         return {context: ctx};
     })`;
@@ -306,6 +307,11 @@ export const getComponentSettingsData = function (operation) {
                 selectedActionHandler[0]["actionHandlerEventName"] = api.eventPayload?.payload?.value;
             }
             return {context: ctx};
+        }else if(elementId == "actionHandlerEventNameFromSource") {
+            if(selectedActionHandler && selectedActionHandler.length > 0) {
+                selectedActionHandler[0]["actionHandlerEventNameFromSource"] = api.eventPayload?.payload?.value || "";
+            }
+            return {context: ctx};
         }else if(elementId == "actionHandlerSourceElement") {
             if(selectedActionHandler && selectedActionHandler.length > 0) {
                 selectedActionHandler[0]["actionHandlerSourceElementId"] = api.eventPayload?.payload?.value;
@@ -342,6 +348,7 @@ export const getComponentSettingsData = function (operation) {
         "componentNameToAdd": "",
         "selectedDynamicPropValue": "",
         "componentDataToPreview": [],
+        "componentDataToPreviewTs": Date.now() + "",
         "actionHandlers": [],
         "newActionHandlerName": "",
         "newActionHandlerEventName": ""
@@ -394,7 +401,7 @@ export const getComponentSettingsData = function (operation) {
             return componentTypes;
         },
         getComponentProperties: (api) => {
-            
+            debugger;
             let componentMetaData = api.context.componentMetaData || {};
             let selectedComponentType = api.context.selectedComponentType || Object.keys(componentMetaData)[0];
             let selectedComponentProps = componentMetaData[selectedComponentType]?.props || [];
@@ -422,6 +429,15 @@ export const getComponentSettingsData = function (operation) {
         },
         getActionHandlers: function(api) {
             return api.context.actionHandlers || [];
+        },
+        getEventNamesForComponent: function(api, componentName) {
+            let options = [];
+            if(componentMetaData[componentName] && componentMetaData[componentName].events) {
+                componentMetaData[componentName].events.map((eventItem) => {
+                    options.push({label: eventItem.name, value: eventItem.name, payload: eventItem.payload})
+                })
+            }
+            return options;
         }
     };
     let widgetContents = [
@@ -754,11 +770,11 @@ export const getComponentSettingsData = function (operation) {
                                                                                                             "name": "propertyDefaultValue",
                                                                                                             "tag": "srs-stylecontainer",
                                                                                                             "props": {
-                                                                                                                "styles": {}
+                                                                                                                "defaultstyles": {}
                                                                                                             },
                                                                                                             "overrides": {
                                                                                                                 "visible": "[[api.context.propType == \"styles\"]]",
-                                                                                                                "styles": "[[api.context.propDefaultValue]]",
+                                                                                                                "defaultstyles": "[[api.context.propDefaultValue]]",
                                                                                                                 "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
                                                                                                             }
                                                                                                         }
@@ -799,7 +815,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                     },
                                                                                                                     "overrides": {
                                                                                                                         "value": "[[api.context.propDynamicValue]]",
-                                                                                                                        "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
+                                                                                                                        "misc": "[[{\"propName\": api.context.propName}]]"
                                                                                                                     }
                                                                                                                 },
                                                                                                                 {
@@ -810,7 +826,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                         "icon": "AddLink"
                                                                                                                     },
                                                                                                                     "overrides": {
-                                                                                                                        "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
+                                                                                                                        "misc": "[[{\"propName\": api.context.propName}]]"
                                                                                                                     }
                                                                                                                 },
                                                                                                                 {
@@ -821,7 +837,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                         "icon": "LinkOff"
                                                                                                                     },
                                                                                                                     "overrides": {
-                                                                                                                        "misc": "[[{\"propName\": api.context.propName, \"propType\": api.context.propType}]]"
+                                                                                                                        "misc": "[[{\"propName\": api.context.propName}]]"
                                                                                                                     }
                                                                                                                 }
                                                                                                             ]
@@ -1349,6 +1365,36 @@ export const getComponentSettingsData = function (operation) {
                                                                                                     },
                                                                                                     "children": [
                                                                                                         {
+                                                                                                            "name": "actionHandlerEventNameFromSource",
+                                                                                                            "elementId": "actionHandlerEventNameFromSource",
+                                                                                                            "tag": "mui-auto-complete",
+                                                                                                            "props": {
+                                                                                                                "label": "Category",
+                                                                                                                "options": [
+                                                                                                                    { "label": "Custom", "value": "" },
+                                                                                                                    { "label": "Mui Button", "value": "mui-button" },
+                                                                                                                    { "label": "Style Container", "value": "srs-style-container" }
+                                                                                                                ],
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerEventNameFromSourceChanged",
+                                                                                                                        "eventName": "SrsMuiSelect#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "selected": "[[api.context.actionHandlerEventNameFromSource || \"\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
                                                                                                             "name": "actionHandlerEventName",
                                                                                                             "elementId": "actionHandlerEventName",
                                                                                                             "tag": "mui-text-field",
@@ -1372,6 +1418,36 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                 ]
                                                                                                             },
                                                                                                             "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerEventNameFromSource == \"\"]]",
+                                                                                                                "value": "[[api.context.actionHandlerEventName]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]"
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerEventName",
+                                                                                                            "elementId": "actionHandlerEventName",
+                                                                                                            "tag": "mui-auto-complete",
+                                                                                                            "props": {
+                                                                                                                "label": "Event Name",
+                                                                                                                "variant": "outlined",
+                                                                                                                "options": [],
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerEventNameChanged",
+                                                                                                                        "eventName": "SrsMuiSelect#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerEventNameFromSource != \"\"]]",
+                                                                                                                "options": "[[api.helper.getEventNamesForComponent(api, api.context.actionHandlerEventNameFromSource)]]",
                                                                                                                 "value": "[[api.context.actionHandlerEventName]]",
                                                                                                                 "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]"
                                                                                                             }
@@ -1535,7 +1611,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                             "elementId": "actionHandlerContextValueKey",
                                                                                                             "tag": "mui-text-field",
                                                                                                             "props": {
-                                                                                                                "label": "Target Event Name",
+                                                                                                                "label": "Event Payload Key",
                                                                                                                 "variant": "outlined",
                                                                                                                 "fullWidth": true,
                                                                                                                 "style": "width: 100%;",
@@ -1676,8 +1752,11 @@ export const getComponentSettingsData = function (operation) {
                                         {
                                             "name": "componentPreviewContentRenderer",
                                             "elementId": "componentPreviewContentRenderer",
-                                            "tag": "srs-contentrenderer",
+                                            "tag": "srs-widget",
                                             "props": {
+                                                "widgetcontents": [], 
+                                                "widgetcontext": {},
+                                                "widgetfunctions": {},
                                                 "styles": {
                                                     "minHeight": "300px",
                                                     "height": "calc(100vh - 20rem)",
@@ -1686,9 +1765,8 @@ export const getComponentSettingsData = function (operation) {
                                                 }
                                             },
                                             "overrides": {
-                                                "overrides": "[[api.helper?.getComponentContents(api)]]"
-                                            },
-                                            "children": []
+                                                "widgetcontents": "[[api.context.componentDataToPreview || []]]"
+                                            }
                                         }
                                     ]
                                 }
@@ -1756,6 +1834,13 @@ export const getComponentSettingsData = function (operation) {
                     {
                         "name": "handleBooleanPropertyDefaultValueChanged",
                         "eventName": "SrsToggle#changed",
+                        "type": "script",
+                        "script": handlePropertyDefaultValueChanged,
+                        "stopPropagation": true
+                    },
+                    {
+                        "name": "handleObjectPropertyDefaultValueChanged",
+                        "eventName": "SrsCodeEditor#changed",
                         "type": "script",
                         "script": handlePropertyDefaultValueChanged,
                         "stopPropagation": true

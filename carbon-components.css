@@ -20554,7 +20554,8 @@ a.cds--header__name,a.cds--header__name:hover {
   position: relative;
   display: none;
   height: 100%;
-  padding-left: 1rem
+  padding-left: 1rem;
+  margin-top: -10px;
 }
 
 @media(min-width: 66rem) {

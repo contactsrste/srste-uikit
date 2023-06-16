@@ -1357,18 +1357,23 @@ export const getPageDetails = async () => {
                                     "children": [
                                         {
                                             "name": "RightContents",
-                                            "tag": "srs-contentrenderer",
+                                            "tag": "srs-widget",
                                             "props": {
+                                                "widgetcontents": [], 
+                                                "widgetcontext": {},
+                                                "widgetfunctions": {},
                                                 "styles": {
                                                     "minHeight": "300px",
                                                     "height": "calc(100vh - 20rem)",
                                                     "maxHeight": "calc(100vh - 20rem)",
                                                     "overflow": "auto"
-                                                }
+                                                },
+                                                "designtime": "true"
                                             },
                                             "overrides": {
-                                                "overrides": "[[api.helper.getContents(api, true)]]",
-                                                "ts": "1683941616850"
+                                                "widgetcontents": "[[api.helper.getContents(api, true)?.contents || []]]",
+                                                "widgetcontext": "[[api.helper.getContents(api, true)?.context || {}]]",
+                                                "widgetfunctions": "[[api.helper.getContents(api, true)?.functions || {}]]"
                                             },
                                             "children": []
                                         }
@@ -1601,7 +1606,7 @@ export const getPageDetails = async () => {
             "elementId": "addFunctionModalContainer",
             "tag": "mui-modal",
             "props": {
-                "open": true
+                "open": false
             },
             "overrides": {
                 "open": "[[api.context.addFunctionOpenModal]]",
@@ -2059,21 +2064,31 @@ export const getPageDetails = async () => {
                         "overrides": {
                             "styles": "[[api.helper.getPreviewContentContainerStyles(api)]]"
                         },
-                        "children": [{
-                            "name": "PreviewContentRenderer",
-                            "elementId": "PreviewContentRenderer",
-                            "tag": "srs-contentrenderer",
-                            "props": {
-                                "styles": {
-                                }
-                            },
-                            "overrides": {
-                                "overrides": "[[api.helper.getContents(api, false)]]",
-                                "ts": "1683941616851",
-                                "style": "[[api.helper.getPreviewContentStyles(api)]]"
-                            },
-                            "children": []
-                        }]
+                        "children": [
+                            {
+                                "name": "PreviewContentRenderer",
+                                "elementId": "PreviewContentRenderer",
+                                "tag": "srs-widget",
+                                "props": {
+                                    "widgetcontents": [], 
+                                    "widgetcontext": {},
+                                    "widgetfunctions": {},
+                                    "styles": {
+                                        "minHeight": "300px",
+                                        "height": "calc(100vh - 20rem)",
+                                        "maxHeight": "calc(100vh - 20rem)",
+                                        "overflow": "auto"
+                                    },
+                                    "designtime": "false"
+                                },
+                                "overrides": {
+                                    "widgetcontents": "[[api.helper.getContents(api, false)?.contents || []]]",
+                                    "widgetcontext": "[[api.helper.getContents(api, false)?.context || {}]]",
+                                    "widgetfunctions": "[[api.helper.getContents(api, false)?.functions || {}]]"
+                                },
+                                "children": []
+                            }
+                        ]
                     }]
                 }
             ]
@@ -2086,7 +2101,8 @@ export const getPageDetails = async () => {
                 "open": false
             },
             "overrides": {
-                "open": "[[api.context.showEmbeddedCodeModal]]"
+                "open": "[[api.context.showEmbeddedCodeModal]]",
+                "visible": "[[api.context.showEmbeddedCodeModal]]"
             },
             "children": [
                 {
@@ -2252,19 +2268,27 @@ export const getPageDetails = async () => {
                             
                         },
                         "children": [
-                            {
+                           {
                                 "name": "componentSettingsContentsWidget",
                                 "elementId": "componentSettingsContentsWidget",
                                 "tag": "srs-widget",
                                 "props": {
-                                    "widgetcontents": componentSettingsWidgetData.contents, 
+                                    "widgetcontents": componentSettingsWidgetData.contents,
                                     "widgetcontext": {},
-                                    "widgetfunctions": componentSettingsWidgetData.functions
+                                    "widgetfunctions": componentSettingsWidgetData.functions,
+                                    "styles": {
+                                        "minHeight": "300px",
+                                        "height": "calc(100vh - 20rem)",
+                                        "maxHeight": "calc(100vh - 20rem)",
+                                        "overflow": "auto"
+                                    },
+                                    "designtime": "false"
                                 },
                                 "overrides": {
-                                    "widgetcontext": "[[api.helper.getComponentSettingsWidgetContext(api)]]"
-                                }
-                            }
+                                    "widgetcontext": "[[api.helper.getComponentSettingsWidgetContext(api) || {}]]"
+                                },
+                                "children": []
+                           }
                         ]
                     }]
                 }
@@ -2705,6 +2729,8 @@ export const getPageDetails = async () => {
         addFunctionOpenModal: false,
         removeFunctionOpenModal: false,
         editFunctionOpenModal: false,
+        previewOpenModal: false,
+        showEmbeddedCodeModal: false,
         componentSettingsOpenModal: false,
         componentAddOpenModal: false,
         componentRemoveOpenModal: false,
