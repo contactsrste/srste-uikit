@@ -80,8 +80,11 @@
         var zeroMDElement = document.createElement("zero-md")
         zeroMDElement.id = "pageContainer";
         var page = "Home";
+        var urlPath = window.location.pathname;
         var queryString = window.location.search?.substr(1) || "";
-        if (queryString) {
+        if(urlPath == "/pagepreview") {
+            page = "PagePreview";
+        }else if (queryString) {
             var queryStringPairs = queryString.split("&");
             queryStringPairs.forEach((queryStringPair) => {
                 var queryKeyValue = queryStringPair.split("=");
@@ -165,9 +168,25 @@
             showEditor(false)
         } else if(page == "Editor") {
             showEditor(true);
+        }else if(page == "PagePreview") {
+            showPreview();
+            showEditor(false);
         }else {
             showEditor(false);
         }
+    }
+
+    async function showPreview() {
+        let {getPageDetails} = await import('./media/json/PagePreview.js');
+        let editorData = await getPageDetails();
+        if(editorData) {
+            window.__SRS__ = window.__SRS__ || {};
+            window.__SRS__.mode = "sandbox";
+            window.__SRS__.context = editorData.pageContext;
+            window.__SRS__.functions = editorData.pageFunctions;
+            window.__SRS__.contents = editorData.pageContents;
+            dispatchEvent(new CustomEvent("GLOBAL_CONTENTS_UPDATED", {}));
+        } 
     }
 
     async function showEditor(showFlag, el) {
