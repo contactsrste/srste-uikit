@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./icon.png" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Srste Platform" />
+    <link rel="apple-touch-icon" href="./icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+    <script async="" type="text/javascript" src="/monaco-editor/dev/vs/loader.js"></script>
+    <script async="async" type="text/javascript" src="/monaco-editor/dev/vs/editor/editor.main.js"></script>
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="static/styles/editor.main.css">
+    <script async="async" type="text/javascript" src="/monaco-editor/dev/vs/editor/editor.main.nls.js"></script>
+    <script async="async" type="text/javascript" src="/monaco-editor/dev/vs/basic-languages/html/html.js"></script>
+    <script async="async" type="text/javascript" src="/monaco-editor/dev/vs/language/html/htmlMode.js"></script>
+    <script async="async" type="text/javascript" src="/monaco-editor/dev/vs/language/html/htmlWorker.js"></script>
+    <title>Srste</title>
+    <script>
+        window.__SRS__ = {};
+        window.__SRS__.mode = "sandbox";
+    </script>
+    <script defer="defer" src="./srste.js"></script>
+    <link href="./static/css/main.621ff9de.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <script defer="defer" src="./srste.js"></script>
+    <link href="./static/css/main.621ff9de.css" rel="stylesheet">
+</head>
+
+<link rel="stylesheet" href="./assets/css/page.css">
+<link rel="stylesheet" href="./assets/css/customstyles.css">
+
+<div id="__srsteroot__" style="overflow:hidden;max-height:100vh"></div>
+<script>
+    showPreview();
+    async function showPreview() {
+        let {getPageDetails} = await import('./media/json/PagePreview.js');
+        let editorData = await getPageDetails();
+        if(editorData) {
+            window.__SRS__ = window.__SRS__ || {};
+            window.__SRS__.mode = "sandbox";
+            window.__SRS__.context = editorData.pageContext;
+            window.__SRS__.functions = editorData.pageFunctions;
+            window.__SRS__.contents = editorData.pageContents;
+            dispatchEvent(new CustomEvent("GLOBAL_CONTENTS_UPDATED", {}));
+        } 
+    }
+
+    //Poll until srste event handlers bind and then refresh the contents once ready.
+    let pollHandler = setInterval(() => {
+        if(window.__SRSINIT__.hasOwnProperty("GLOBAL_CONTENTS_UPDATED")) {
+            clearInterval(pollHandler);
+            dispatchEvent(new CustomEvent("GLOBAL_CONTENTS_UPDATED", {}));
+        }
+    }, 100);
+
+</script>
+</html>
