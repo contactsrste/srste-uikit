@@ -50,7 +50,7 @@
 
     //Poll until srste event handlers bind and then refresh the contents once ready.
     let pollHandler = setInterval(() => {
-        if(window.__SRSINIT__.hasOwnProperty("GLOBAL_CONTENTS_UPDATED")) {
+        if(window.__SRSINIT__ && window.__SRSINIT__.hasOwnProperty("GLOBAL_CONTENTS_UPDATED")) {
             clearInterval(pollHandler);
             dispatchEvent(new CustomEvent("GLOBAL_CONTENTS_UPDATED", {}));
         }
