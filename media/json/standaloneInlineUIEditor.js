@@ -2018,7 +2018,8 @@ export const getPageDetails = async () => {
                                 "display": "flex",
                                 "flexDirection": "row",
                                 "justifyContent": "center",
-                                "boxShadow": "inset -2px -2px 9px grey"
+                                "boxShadow": "inset -2px -2px 9px grey",
+                                "justifyContent": "flex-start"
                             }
                         },
                         "overrides": {
