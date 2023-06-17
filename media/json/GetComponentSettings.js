@@ -1,6 +1,4 @@
 import {getComponentMetadata} from "./BuilderUtils.js";
-
-import {getComponentMetadata} from "./BuilderUtils";
 let componentMetaData = getComponentMetadata();
 
 export const getComponentSettingsData = function (operation) {
