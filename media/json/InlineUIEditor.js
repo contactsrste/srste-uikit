@@ -602,7 +602,6 @@ export const getPageDetails = async () => {
         debugger;
         let ctx = api.context || {};
         let elementId = api.eventPayload?.payload?.id || "";    
-        console.log("in onComponentSettingsClicked", elementId);
         ctx.selectedComponentForSettings = elementId;
         let contentItems = ctx.pageData.contents;
         contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
@@ -612,17 +611,19 @@ export const getPageDetails = async () => {
         
         if(matchedElement?.props && Object.keys(matchedElement.props).length > 0) {
             Object.keys(matchedElement.props).map((propName) => {
-                selectedComponentPropData[propName] = {
-                    defaultValue: matchedElement.props[propName],
-                    overrideValue: matchedElement.overrides?.[propName] || ""
+                if(propName != actionhandlers) {
+                    selectedComponentPropData[propName] = {
+                        defaultValue: matchedElement.props[propName],
+                        overrideValue: matchedElement.overrides?.[propName] || ""
+                    }
                 }
             })
         }
         ctx.selectedComponentPropData = selectedComponentPropData;
         let selectedComponentActionHandlerData = [];
         
-        if(matchedElement?.actionhandlers && matchedElement.actionhandlers.length > 0) {
-            matchedElement.actionhandlers.map((actionHandlerItem) => {
+        if(matchedElement?.props?.actionhandlers && matchedElement.props?.actionhandlers.length > 0) {
+            matchedElement.props?.actionhandlers.map((actionHandlerItem) => {
                 let transformedActionHandler = {
                     actionHandlerName: actionHandlerItem.name,
                     actionHandlerEventName: actionHandlerItem.eventName,
