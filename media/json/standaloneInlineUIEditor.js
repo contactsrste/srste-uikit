@@ -2040,6 +2040,9 @@ export const getPageDetails = async () => {
                                         "maxHeight": "calc(100vh - 20rem)",
                                         "overflow": "auto"
                                     },
+                                    "hoststyles": {
+                                        "width": "100%"
+                                    },
                                     "designtime": "false"
                                 },
                                 "overrides": {
