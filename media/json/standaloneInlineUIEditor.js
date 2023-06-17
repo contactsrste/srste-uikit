@@ -611,7 +611,7 @@ export const getPageDetails = async () => {
         
         if(matchedElement?.props && Object.keys(matchedElement.props).length > 0) {
             Object.keys(matchedElement.props).map((propName) => {
-                if(propName != actionhandlers) {
+                if(propName != "actionhandlers") {
                     selectedComponentPropData[propName] = {
                         defaultValue: matchedElement.props[propName],
                         overrideValue: matchedElement.overrides?.[propName] || ""
