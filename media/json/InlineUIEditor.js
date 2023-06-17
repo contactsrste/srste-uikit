@@ -2758,6 +2758,7 @@ export const getPageDetails = async () => {
                 "display": "flex",
                 "flexDirection": "row",
                 "justifyContent": "flex-start",
+                "padding": "2px 5px",
                 "boxShadow": "inset -2px -2px 9px grey",
                 "position": "absolute",
                 "left": "calc((100vw - " + api.context.screenWidth + ") / 2)"    
