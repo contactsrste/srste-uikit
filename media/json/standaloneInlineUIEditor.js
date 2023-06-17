@@ -1310,7 +1310,7 @@ export const getPageDetails = async () => {
                                             "height": "3rem",
                                             "justifyContent": "center",
                                             "boxShadow": "-2px 2px 7px 0px grey",
-                                            "height": "calc(100vh - 20rem)",
+                                            "height": "calc(100vh - 10rem)",
                                             "justifyContent": "flex-start"
                                         }
                                     },
@@ -1324,8 +1324,8 @@ export const getPageDetails = async () => {
                                                 "widgetfunctions": {},
                                                 "styles": {
                                                     "minHeight": "300px",
-                                                    "height": "calc(100vh - 20rem)",
-                                                    "maxHeight": "calc(100vh - 20rem)",
+                                                    "height": "calc(100vh - 10rem)",
+                                                    "maxHeight": "calc(100vh - 10rem)",
                                                     "overflow": "auto"
                                                 },
                                                 "designtime": "true"
