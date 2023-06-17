@@ -31,11 +31,11 @@
 <link rel="stylesheet" href="./assets/css/page.css">
 <link rel="stylesheet" href="./assets/css/customstyles.css">
 
-<div id="__srsteroot__" style="overflow:hidden;max-height:100vh"></div>
+<div id="__srsteroot__" style="overflow:hidden;min-height: 100vh; max-height:100vh"></div>
 <script>
     async function loadEditorData() {
         debugger;
-        let {getPageDetails} = await import('./media/json/inlineUIEditor.js');
+        let {getPageDetails} = await import('./media/json/standaloneInlineUIEditor.js');
         let editorData = await getPageDetails();
         if(editorData) {
             window.__SRS__ = window.__SRS__ || {};
