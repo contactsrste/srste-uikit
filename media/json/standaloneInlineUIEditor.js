@@ -2017,7 +2017,6 @@ export const getPageDetails = async () => {
                             "styles": {
                                 "display": "flex",
                                 "flexDirection": "row",
-                                "justifyContent": "center",
                                 "boxShadow": "inset -2px -2px 9px grey",
                                 "justifyContent": "flex-start"
                             }
