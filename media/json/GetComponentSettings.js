@@ -1,4 +1,6 @@
 import {getComponentMetadata} from "./BuilderUtils.js";
+
+import {getComponentMetadata} from "./BuilderUtils";
 let componentMetaData = getComponentMetadata();
 
 export const getComponentSettingsData = function (operation) {
@@ -233,14 +235,13 @@ export const getComponentSettingsData = function (operation) {
                 }
                 transformedActionHandlers.push(transformedActionHandler);
             });
-    
+            componentProps = {...componentProps, "actionhandlers": transformedActionHandlers};
             let componentDataToUpdate = {
                 "name": ctx.componentOperation == "edit"? ctx.selectedComponentName: ctx.componentNameToAdd,
                 "elementId": ctx.componentOperation == "edit"? ctx.selectedComponentName: ctx.componentNameToAdd,
                 "tag": ctx.selectedComponentType,
                 "props": componentProps,
-                "overrides": componentOverrideProps,
-                "actionhandlers": transformedActionHandlers 
+                "overrides": componentOverrideProps 
             };
             if(ctx.componentOperation == "edit" && "componentSettingsContentsWidget" == widgetId) {
                 api.dispatchEvent("UPDATE_COMPONENT_DATA", {elementId: ctx.selectedComponentName, payload: componentDataToUpdate});
@@ -351,7 +352,8 @@ export const getComponentSettingsData = function (operation) {
         "componentDataToPreviewTs": Date.now() + "",
         "actionHandlers": [],
         "newActionHandlerName": "",
-        "newActionHandlerEventName": ""
+        "newActionHandlerEventName": "",
+        "componentCtx": {}
     };
     let widgetFunctions = {
         isPropertyLinkingMode: (api) => {
@@ -364,7 +366,7 @@ export const getComponentSettingsData = function (operation) {
                 for (const name in obj) {
                     if (obj.hasOwnProperty(name)) {
                         const children = obj[name];
-                        const label = `Node ${name}`;
+                        const label = `${name}`;
                         
                         const childArray = typeof children == "object"? convertObjectToRepresentation(children): [];
             
@@ -379,7 +381,7 @@ export const getComponentSettingsData = function (operation) {
                 return result;
             }
             
-            return convertObjectToRepresentation(api.context || {});
+            return convertObjectToRepresentation(api.context?.componentCtx || {});
         },
         getSelectedPath: (api) => {
             
@@ -429,6 +431,15 @@ export const getComponentSettingsData = function (operation) {
         },
         getActionHandlers: function(api) {
             return api.context.actionHandlers || [];
+        },
+        getComponentNames: function(api) {
+            let options = [ { label: "Custom", value: "" } ];
+            if(componentMetaData) {
+                Object.keys(componentMetaData).map((componentName) => {
+                    options.push({label: componentName, value: componentName})
+                })
+            }
+            return options;
         },
         getEventNamesForComponent: function(api, componentName) {
             let options = [];
@@ -980,7 +991,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                 "items": [],
                                                                                 "actionicons": [],
                                                                                 "inlinestyles": {
-                                                                                    "maxHeight": "500px",
+                                                                                    "maxHeight": "300px",
                                                                                     "overflow": "auto"
                                                                                 }
                                                                             },
@@ -1390,6 +1401,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                 ]
                                                                                                             },
                                                                                                             "overrides": {
+                                                                                                                "options": "[[api.helper.getComponentNames(api)]]",
                                                                                                                 "selected": "[[api.context.actionHandlerEventNameFromSource || \"\"]]",
                                                                                                                 "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]"
                                                                                                             }
@@ -1418,7 +1430,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                 ]
                                                                                                             },
                                                                                                             "overrides": {
-                                                                                                                "visible": "[[api.context.actionHandlerEventNameFromSource == \"\"]]",
+                                                                                                                "visible": "[[!api.context.actionHandlerEventNameFromSource || api.context.actionHandlerEventNameFromSource == \"\"]]",
                                                                                                                 "value": "[[api.context.actionHandlerEventName]]",
                                                                                                                 "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]"
                                                                                                             }
@@ -1446,7 +1458,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                 ]
                                                                                                             },
                                                                                                             "overrides": {
-                                                                                                                "visible": "[[api.context.actionHandlerEventNameFromSource != \"\"]]",
+                                                                                                                "visible": "[[!!api.context.actionHandlerEventNameFromSource]]",
                                                                                                                 "options": "[[api.helper.getEventNamesForComponent(api, api.context.actionHandlerEventNameFromSource)]]",
                                                                                                                 "value": "[[api.context.actionHandlerEventName]]",
                                                                                                                 "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]"
