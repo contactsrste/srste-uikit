@@ -2760,7 +2760,7 @@ export const getPageDetails = async () => {
             let baseStyles = {
                 "display": "flex",
                 "flexDirection": "row",
-                "justifyContent": "center",
+                "justifyContent": "flex-start",
                 "boxShadow": "inset -2px -2px 9px grey",
                 "position": "absolute",
                 "left": "calc((100vw - " + api.context.screenWidth + ") / 2)"    
