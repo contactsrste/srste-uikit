@@ -1,4 +1,5 @@
-export const getComponentSettingsData = function (operation) {
+window.__SRSINIT__ = window.__SRSINIT__ || {};
+window.__SRSINIT__.widgetData = (function () {
     const {getComponentMetadata} = import("./BuilderUtils.js");
     let componentMetaData = getComponentMetadata();
     let linkTypeChanged = `(async function() {
@@ -340,7 +341,7 @@ export const getComponentSettingsData = function (operation) {
         "selectedPropertyToEdit": "",
         "componentMetaData": componentMetaData || {},
         "componentPropData": {},
-        "componentOperation": operation || "edit",
+        "componentOperation": "edit",
         "selectedComponentPosition": "after",
         "componentNameToAdd": "",
         "selectedDynamicPropValue": "",
@@ -1907,4 +1908,4 @@ export const getComponentSettingsData = function (operation) {
         }
     ];
     return { contents: widgetContents, context: widgetContext, functions: widgetFunctions };
-}
+})();
