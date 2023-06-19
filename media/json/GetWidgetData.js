@@ -1,6 +1,6 @@
 window.__SRSINIT__ = window.__SRSINIT__ || {};
 window.__SRSINIT__.widgetData = (function () {
-    const {getComponentMetadata} = import("./BuilderUtils.js");
+    const {getComponentMetadata} = import("/media/json/BuilderUtils.js");
     let componentMetaData = getComponentMetadata();
     let linkTypeChanged = `(async function() {
         
