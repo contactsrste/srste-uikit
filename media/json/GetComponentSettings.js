@@ -1,8 +1,6 @@
-import {getComponentMetadata} from "./BuilderUtils.js";
-let componentMetaData = getComponentMetadata();
-
 export const getComponentSettingsData = function (operation) {
-
+    const {getComponentMetadata} = import("./BuilderUtils.js");
+    let componentMetaData = getComponentMetadata();
     let linkTypeChanged = `(async function() {
         
         let elementId = api.eventPayload?.payload?.id;   
