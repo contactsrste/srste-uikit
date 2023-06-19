@@ -1,4 +1,5 @@
-export const getComponentSettingsData = function (operation) {
+// export const getComponentSettingsData = function (operation) {
+module.exports = function(operation) {
     const {getComponentMetadata} = import("./BuilderUtils.js");
     let componentMetaData = getComponentMetadata();
     let linkTypeChanged = `(async function() {
