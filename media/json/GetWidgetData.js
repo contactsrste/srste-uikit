@@ -1,4 +1,5 @@
-(function () {
+window.__SRSWIDGETS__ =  window.__SRSWIDGETS__ || {};
+window.__SRSWIDGETS__["widget1"] = (function (api) {
     let componentMetaData = {
         "mui-accordion": {
             "props": [
@@ -6235,10 +6236,5 @@
             }
         }
     ];
-    let result = { contents: widgetContents, context: widgetContext, functions: widgetFunctions };
-
-    // Call the callback function with the result
-    if (typeof window.dynamicScriptLoaded === 'function') {
-        window.dynamicScriptLoaded(result);
-    }
-})();
+    return { contents: widgetContents, context: widgetContext, functions: widgetFunctions }
+})
