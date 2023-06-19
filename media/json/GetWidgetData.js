@@ -1,5 +1,4 @@
-window.__SRSINIT__ = window.__SRSINIT__ || {};
-window.__SRSINIT__.widgetData = (function () {
+(function () {
   
     let componentMetaData = {
         "mui-accordion": {
@@ -4331,7 +4330,7 @@ window.__SRSINIT__.widgetData = (function () {
             ]
         }
     };
-    
+
     let linkTypeChanged = `(async function() {
         
         let elementId = api.eventPayload?.payload?.id;   
