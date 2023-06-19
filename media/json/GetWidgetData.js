@@ -1,5 +1,4 @@
-(function () {
-  
+(function getWidgetData() {
     let componentMetaData = {
         "mui-accordion": {
             "props": [
@@ -6237,4 +6236,4 @@
         }
     ];
     return { contents: widgetContents, context: widgetContext, functions: widgetFunctions };
-})();
+});
