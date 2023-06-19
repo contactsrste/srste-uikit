@@ -1,11 +1,12 @@
-(function getWidgetData() {
+
+window.getWidgetData = function () {
     let componentMetaData = {
         "mui-accordion": {
             "props": [
-                { 
-                    "name": "sx", 
-                    "label": "Styles", 
-                    "type": "styles" 
+                {
+                    "name": "sx",
+                    "label": "Styles",
+                    "type": "styles"
                 }
             ],
             "events": [
@@ -4575,7 +4576,7 @@
                 api.dispatchEvent("ADD_COMPONENT_DATA", {elementId: ctx.selectedComponentName, position: ctx.selectedComponentPosition, payload: componentDataToUpdate})
             }
         }
-    })`;    
+    })`;
 
 
     let addNewActionHandler = `(async function() {
@@ -4687,14 +4688,14 @@
         getContextTree: (api) => {
             function convertObjectToRepresentation(obj) {
                 const result = [];
-            
+
                 for (const name in obj) {
                     if (obj.hasOwnProperty(name)) {
                         const children = obj[name];
                         const label = `${name}`;
-                        
-                        const childArray = typeof children == "object"? convertObjectToRepresentation(children): [];
-            
+
+                        const childArray = typeof children == "object" ? convertObjectToRepresentation(children) : [];
+
                         result.push({
                             name,
                             label,
@@ -4702,17 +4703,17 @@
                         });
                     }
                 }
-            
+
                 return result;
             }
-            
+
             return convertObjectToRepresentation(api.context?.componentCtx || {});
         },
         getSelectedPath: (api) => {
-            
+
             let selectedDynamicPropValue = api.context?.selectedDynamicPropValue || "";
             let result = "";
-            if(selectedDynamicPropValue && selectedDynamicPropValue.indexOf("api.context.") > -1) {
+            if (selectedDynamicPropValue && selectedDynamicPropValue.indexOf("api.context.") > -1) {
                 result = selectedDynamicPropValue.split("api.context.")[1]
             }
             return result;
@@ -4720,9 +4721,9 @@
         getComponentTypes: (api) => {
             let componentMetaData = api.context.componentMetaData || {};
             let componentTypes = [];
-            if(componentMetaData && Object.keys(componentMetaData).length > 0) {
+            if (componentMetaData && Object.keys(componentMetaData).length > 0) {
                 Object.keys(componentMetaData).map((componentName) => {
-                    componentTypes.push({"label": componentName, "value": componentName});
+                    componentTypes.push({ "label": componentName, "value": componentName });
                 });
             }
             return componentTypes;
@@ -4733,10 +4734,10 @@
             let selectedComponentType = api.context.selectedComponentType || Object.keys(componentMetaData)[0];
             let selectedComponentProps = componentMetaData[selectedComponentType]?.props || [];
             let componentProperties = [];
-            if(selectedComponentProps && selectedComponentProps.length > 0) {
+            if (selectedComponentProps && selectedComponentProps.length > 0) {
                 selectedComponentProps.map((componentProp) => {
                     componentProperties.push({
-                        "propName": componentProp.name, 
+                        "propName": componentProp.name,
                         "propType": componentProp.type,
                         "propDefaultValue": api.context.componentPropData?.[componentProp.name]?.["defaultValue"] || "",
                         "propDynamicValue": api.context.componentPropData?.[componentProp.name]?.["overrideValue"] || "",
@@ -4746,7 +4747,7 @@
             }
             return componentProperties;
         },
-        getComponentContents: function(api) {
+        getComponentContents: function (api) {
             return {
                 contents: api.context.componentDataToPreview,
                 context: {},
@@ -4754,23 +4755,23 @@
                 designtime: false
             };
         },
-        getActionHandlers: function(api) {
+        getActionHandlers: function (api) {
             return api.context.actionHandlers || [];
         },
-        getComponentNames: function(api) {
-            let options = [ { label: "Custom", value: "" } ];
-            if(componentMetaData) {
+        getComponentNames: function (api) {
+            let options = [{ label: "Custom", value: "" }];
+            if (componentMetaData) {
                 Object.keys(componentMetaData).map((componentName) => {
-                    options.push({label: componentName, value: componentName})
+                    options.push({ label: componentName, value: componentName })
                 })
             }
             return options;
         },
-        getEventNamesForComponent: function(api, componentName) {
+        getEventNamesForComponent: function (api, componentName) {
             let options = [];
-            if(componentMetaData[componentName] && componentMetaData[componentName].events) {
+            if (componentMetaData[componentName] && componentMetaData[componentName].events) {
                 componentMetaData[componentName].events.map((eventItem) => {
-                    options.push({label: eventItem.name, value: eventItem.name, payload: eventItem.payload})
+                    options.push({ label: eventItem.name, value: eventItem.name, payload: eventItem.payload })
                 })
             }
             return options;
@@ -4844,7 +4845,7 @@
                                         "sx": {
                                             "backgroundColor": "var(--cds-background-hover)",
                                             "color": "var(--cds-text-secondary)",
-                                            "width": "100%", 
+                                            "width": "100%",
                                             "padding": "5px"
                                         }
                                     },
@@ -5213,7 +5214,7 @@
                                                             "props": {
                                                                 "label": "Property Name",
                                                                 "variant": "outlined",
-                                                                "disabled": true                                                            
+                                                                "disabled": true
                                                             },
                                                             "overrides": {
                                                                 "value": "[[api.context.selectedPropertyToEdit]]"
@@ -5481,7 +5482,7 @@
                                                                             "paddingLeft": "5px",
                                                                             "display": "flex",
                                                                             "flexDirection": "row"
-        
+
                                                                         }
                                                                     },
                                                                     "children": [
@@ -5796,15 +5797,15 @@
                                                                                                             "props": {
                                                                                                                 "options": [
                                                                                                                     {
-                                                                                                                        "label": "UPDATE_CONTEXT", 
+                                                                                                                        "label": "UPDATE_CONTEXT",
                                                                                                                         "value": "UPDATE_CONTEXT"
                                                                                                                     },
                                                                                                                     {
-                                                                                                                        "label": "Script", 
+                                                                                                                        "label": "Script",
                                                                                                                         "value": "script"
                                                                                                                     },
                                                                                                                     {
-                                                                                                                        "label": "Relay", 
+                                                                                                                        "label": "Relay",
                                                                                                                         "value": "relay"
                                                                                                                     }
                                                                                                                 ],
@@ -5998,7 +5999,7 @@
                             "elementId": "componentPreviewContainer",
                             "tag": "mui-grid",
                             "props": {
-                                "item": true, 
+                                "item": true,
                                 "md": 6,
                                 "sx": {
                                     "backgroundColor": "var(--cds-background-hover)",
@@ -6091,7 +6092,7 @@
                                             "elementId": "componentPreviewContentRenderer",
                                             "tag": "srs-widget",
                                             "props": {
-                                                "widgetcontents": [], 
+                                                "widgetcontents": [],
                                                 "widgetcontext": {},
                                                 "widgetfunctions": {},
                                                 "styles": {
@@ -6236,4 +6237,4 @@
         }
     ];
     return { contents: widgetContents, context: widgetContext, functions: widgetFunctions };
-});
+}
