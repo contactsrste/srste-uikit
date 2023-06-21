@@ -65,7 +65,8 @@ export const getPageDetails = async () => {
             ctx.contentHistory.push(pageContents);
             ctx.contentHistoryIndex = ctx.contentHistoryIndex + 1;
             return {context: ctx};
-        }else if(elementId == "OpenPreview") {    
+        }else if(elementId == "OpenPreview") { 
+            debugger;   
             let pageData = ctx.pageData || "{}";
             pageData = typeof ctx.pageData == "string"? JSON.parse(pageData): pageData;    
             let pageContents = pageData?.contents || [];
@@ -601,7 +602,7 @@ export const getPageDetails = async () => {
     let onComponentSettingsClicked = `(async function() {    
         debugger;
         let ctx = api.context || {};
-        let elementId = api.eventPayload?.payload?.id || "";    
+        let elementId = api.eventPayload?.payload?.id || "";
         ctx.selectedComponentForSettings = elementId;
         let contentItems = ctx.pageData.contents;
         contentItems = typeof contentItems == "string"? JSON.parse(contentItems): contentItems;
@@ -643,6 +644,17 @@ export const getPageDetails = async () => {
                         transformedActionHandler.actionHandlerSourceElement = actionHandlerItem.source_elementid;
                         transformedActionHandler.actionHandlerTargetEventName = actionHandlerItem.target_eventname;
                         transformedActionHandler.add_to_payload = actionHandlerItem.add_to_payload;
+                        break;
+                    case "HTTP_REQUEST":
+                        transformedActionHandler.actionHandlerSourceElement = actionHandler.source_elementid;
+                        transformedActionHandler.actionHandlerHttpMethod = actionHandler.http_method;
+                        transformedActionHandler.actionHandlerBaseUrl = actionHandler.base_url;
+                        transformedActionHandler.actionHandlerPath = actionHandler.path;
+                        transformedActionHandler.actionHandlerHeaders = actionHandler.headers || {};
+                        transformedActionHandler.actionHandlerParams = actionHandler.params || {};
+                        transformedActionHandler.actionHandlerData = actionHandler.data || {};
+                        transformedActionHandler.actionHandlerOutputMap = actionHandler.output_mapping || {};
+                        transformedActionHandler.actionHandlerUpdateGlobalContext = actionHandler.update_global_context || false;
                         break;
                 }
 
@@ -981,6 +993,46 @@ export const getPageDetails = async () => {
                 "embedded_styles": ""
             },
             "children": [
+                {
+                    "name": "HeroSection",
+                    "tag": "srs-container",
+                    "props": {
+                        "styles": {
+                            "background-image": "",
+                            "background-size": "cover",
+                            "padding": "2rem",
+                            "min-height": "50px",
+                            "color": "#fff",
+                            "placeContent": "start",
+                            "backgroundColor": "#0c0326"
+                        },
+                        "embedded_styles": ""
+                    },
+                    "children": [
+                        {
+                            "name": "HeroContainer",
+                            "tag": "srs-container",
+                            "props": {
+                                "styles": {
+                                    "backgroundColor": "var(--cds-background-hover)",
+                                    "minHeight": 25,
+                                    "minWidth": "80%"
+                                },
+                                "embedded_styles": ""
+                            },
+                            "children": [
+                                {
+                                    "name": "Hero Title",
+                                    "tag": "srs-richtext",
+                                    "props": {
+                                        "html_string": "<h3>UI Editor</h3>"
+                                    },
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
                 {
                     "name": "ActionContainer",
                     "tag": "srs-container",
@@ -2035,11 +2087,13 @@ export const getPageDetails = async () => {
                                     "widgetcontext": {},
                                     "widgetfunctions": {},
                                     "styles": {
+                                        "width": "100%",
                                         "minHeight": "300px",
                                         "height": "calc(100vh - 20rem)",
                                         "maxHeight": "calc(100vh - 20rem)",
                                         "overflow": "auto"
                                     },
+                                    "hoststyles": {"width": "100%"},
                                     "designtime": "false"
                                 },
                                 "overrides": {
@@ -2235,7 +2289,7 @@ export const getPageDetails = async () => {
                                 "tag": "srs-widget",
                                 "props": {
                                     "widgetcontents": componentSettingsWidgetData.contents,
-                                    "widgetcontext": {},
+                                    "widgetcontext": componentSettingsWidgetData.context,
                                     "widgetfunctions": componentSettingsWidgetData.functions,
                                     "styles": {
                                         "minHeight": "300px",
@@ -2871,15 +2925,32 @@ export const getPageDetails = async () => {
                 }];
             }
 
-            let ctx = {...api.context.componentSettingsWidgetContext, selectedComponentName: api.context.selectedComponentForSettings, 
+            let pageDataCtx = api.context.pageData?.context || {};
+            if(typeof pageDataCtx == "string") {
+                try {
+                    pageDataCtx = JSON.parse(pageDataCtx) || {};
+                }catch(err) { }
+            }
+             
+            let ctx = { ...api.context.componentSettingsWidgetContext, selectedComponentName: api.context.selectedComponentForSettings, 
                 selectedComponentType: api.context.selectedComponentTypeForSettings, componentPropData: api.context.selectedComponentPropData, 
-                actionHandlers: api.context.selectedComponentActionHandlerData, componentOperation: "edit", componentDataToPreview
+                actionHandlers: api.context.selectedComponentActionHandlerData, componentOperation: "edit", componentDataToPreview,
+                componentCtx: pageDataCtx
             };
             return ctx;
         },
         "getComponentAddWidgetContext": function(api) {
-            let ctx = {...api.context.componentAddWidgetContext, selectedComponentName: api.context.selectedComponentForAdd, 
-                selectedComponentType: api.context.selectedComponentTypeForAdd, componentNameToAdd: "", componentOperation: "add"};
+            let pageDataCtx = api.context.pageData?.context || {};
+            if(typeof pageDataCtx == "string") {
+                try {
+                    pageDataCtx = JSON.parse(pageDataCtx) || {};
+                }catch(err) { }
+            }
+
+            let ctx = { ...api.context.componentAddWidgetContext, selectedComponentName: api.context.selectedComponentForAdd, 
+                selectedComponentType: api.context.selectedComponentTypeForAdd, componentNameToAdd: "", componentOperation: "add",
+                componentCtx: pageDataCtx
+            };
             return ctx
         }
     };

@@ -2,6 +2,7 @@ import {getComponentMetadata} from "./BuilderUtils.js";
 let componentMetaData = getComponentMetadata();
 
 export const getComponentSettingsData = function (operation) {
+
     let linkTypeChanged = `(async function() {
         
         let elementId = api.eventPayload?.payload?.id;   
@@ -219,16 +220,28 @@ export const getComponentSettingsData = function (operation) {
                     case "script": 
                         transformedActionHandler.script = actionHandler.actionHandlerScript;
                         break;
-                    case "UPDATE_CONTEXT": 
+                    case "UPDATE_CONTEXT":
+                    case "UPDATE_GLOBAL_CONTEXT": 
+                        transformedActionHandler.source_elementid = actionHandler.actionHandlerSourceElement;
                         transformedActionHandler.contextValueKey = actionHandler.actionHandlerContextValueKey;
                         transformedActionHandler.contextPath = actionHandler.actionHandlerContextPath;
-                        transformedActionHandler.source_elementid = actionHandler.actionHandlerSourceElement;
                         break;
                     case "relay":
                         transformedActionHandler.source_elementid = actionHandler.actionHandlerSourceElement;
                         transformedActionHandler.target_eventname = actionHandler.actionHandlerTargetEventName;
                         transformedActionHandler.add_to_payload = actionHandler.add_to_payload;
                         break;
+                    case "HTTP_REQUEST":
+                        transformedActionHandler.source_elementid = actionHandler.actionHandlerSourceElement;
+                        transformedActionHandler.http_method = actionHandler.actionHandlerHttpMethod;
+                        transformedActionHandler.base_url = actionHandler.actionHandlerBaseUrl;
+                        transformedActionHandler.path = actionHandler.actionHandlerPath;
+                        transformedActionHandler.headers = actionHandler.actionHandlerHeaders || {};
+                        transformedActionHandler.params = actionHandler.actionHandlerParams || {};
+                        transformedActionHandler.data = actionHandler.actionHandlerData || {};
+                        transformedActionHandler.output_mapping = actionHandler.actionHandlerOutputMap || {};
+                        transformedActionHandler.update_global_context = actionHandler.actionHandlerUpdateGlobalContext || false;
+                        break;                        
                 }
                 transformedActionHandlers.push(transformedActionHandler);
             });
@@ -272,7 +285,15 @@ export const getComponentSettingsData = function (operation) {
                 "actionHandlerSourceElementId": ctx.selectedComponentName,
                 "actionHandlerTargetEventName": "",
                 "actionHandlerContextPath": "",
-                "actionHandlerContextValueKey": ""
+                "actionHandlerContextValueKey": "",
+                "actionHandlerHttpMethod": "GET",
+                "actionHandlerBaseUrl": "",
+                "actionHandlerPath": "",
+                "actionHandlerHeaders": {},
+                "actionHandlerParams": {},
+                "actionHandlerData": {},
+                "actionHandlerOutputMap": {},
+                "actionHandlerUpdateGlobalContext": false
             }].concat(ctx.actionHandlers);
             return {context: ctx};
         }
@@ -285,52 +306,10 @@ export const getComponentSettingsData = function (operation) {
         let selectedHandlerName = misc.handlerName;
         let selectedActionHandler = ctx.actionHandlers.filter((item) => item.actionHandlerName == selectedHandlerName);
             
-        if(elementId == "actionHandlerType") {
-            if(selectedActionHandler && selectedActionHandler.length > 0) {
-                selectedActionHandler[0]["actionHandlerType"] = api.eventPayload?.payload?.value;
-            }
-            return {context: ctx};
-        }else if(elementId == "actionHandlerScript") {
-            if(selectedActionHandler && selectedActionHandler.length > 0) {
-                selectedActionHandler[0]["actionHandlerScript"] = api.eventPayload?.payload?.value;
-            }
-            return {context: ctx};
-        }else if(elementId == "actionHandlerName") {
-            if(selectedActionHandler && selectedActionHandler.length > 0) {
-                selectedActionHandler[0]["actionHandlerName"] = api.eventPayload?.payload?.value;
-            }
-            return {context: ctx};
-        }else if(elementId == "actionHandlerEventName") {
-            if(selectedActionHandler && selectedActionHandler.length > 0) {
-                selectedActionHandler[0]["actionHandlerEventName"] = api.eventPayload?.payload?.value;
-            }
-            return {context: ctx};
-        }else if(elementId == "actionHandlerEventNameFromSource") {
-            if(selectedActionHandler && selectedActionHandler.length > 0) {
-                selectedActionHandler[0]["actionHandlerEventNameFromSource"] = api.eventPayload?.payload?.value || "";
-            }
-            return {context: ctx};
-        }else if(elementId == "actionHandlerSourceElement") {
-            if(selectedActionHandler && selectedActionHandler.length > 0) {
-                selectedActionHandler[0]["actionHandlerSourceElementId"] = api.eventPayload?.payload?.value;
-            }
-            return {context: ctx};
-        }else if(elementId == "actionHandlerContextPath") {
-            if(selectedActionHandler && selectedActionHandler.length > 0) {
-                selectedActionHandler[0]["actionHandlerContextPath"] = api.eventPayload?.payload?.value;
-            }
-            return {context: ctx};
-        }else if(elementId == "actionHandlerContextValueKey") {
-            if(selectedActionHandler && selectedActionHandler.length > 0) {
-                selectedActionHandler[0]["actionHandlerContextValueKey"] = api.eventPayload?.payload?.value;
-            }
-            return {context: ctx};
-        }else if(elementId == "actionHandlerTargetEventName") {
-            if(selectedActionHandler && selectedActionHandler.length > 0) {
-                selectedActionHandler[0]["actionHandlerTargetEventName"] = api.eventPayload?.payload?.value;
-            }
-            return {context: ctx};
+        if(selectedActionHandler && selectedActionHandler.length > 0) {
+            selectedActionHandler[0][elementId] = api.eventPayload?.payload?.value || ""
         }
+        return {context: ctx};
     })`;
 
     let widgetContext = {
@@ -1472,12 +1451,20 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                         "value": "UPDATE_CONTEXT"
                                                                                                                     },
                                                                                                                     {
+                                                                                                                        "label": "UPDATE_GLOBAL_CONTEXT", 
+                                                                                                                        "value": "UPDATE_GLOBAL_CONTEXT"
+                                                                                                                    },
+                                                                                                                    {
                                                                                                                         "label": "Script", 
                                                                                                                         "value": "script"
                                                                                                                     },
                                                                                                                     {
                                                                                                                         "label": "Relay", 
                                                                                                                         "value": "relay"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "label": "HTTP_REQUEST", 
+                                                                                                                        "value": "HTTP_REQUEST"
                                                                                                                     }
                                                                                                                 ],
                                                                                                                 "selected": "script",
@@ -1609,7 +1596,7 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                 ]
                                                                                                             },
                                                                                                             "overrides": {
-                                                                                                                "visible": "[[api.context.actionHandlerType == \"UPDATE_CONTEXT\"]]",
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"UPDATE_CONTEXT\" || api.context.actionHandlerType == \"UPDATE_GLOBAL_CONTEXT\"]]",
                                                                                                                 "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
                                                                                                                 "value": "[[api.context.actionHandlerContextPath]]"
                                                                                                             },
@@ -1639,9 +1626,264 @@ export const getComponentSettingsData = function (operation) {
                                                                                                                 ]
                                                                                                             },
                                                                                                             "overrides": {
-                                                                                                                "visible": "[[api.context.actionHandlerType == \"UPDATE_CONTEXT\"]]",
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"UPDATE_CONTEXT\" || api.context.actionHandlerType == \"UPDATE_GLOBAL_CONTEXT\"]]",
                                                                                                                 "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
                                                                                                                 "value": "[[api.context.actionHandlerContextValueKey]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerHttpMethod",
+                                                                                                            "elementId": "actionHandlerHttpMethod",
+                                                                                                            "tag": "mui-auto-complete",
+                                                                                                            "props": {
+                                                                                                                "options": [
+                                                                                                                    {
+                                                                                                                        "label": "GET", 
+                                                                                                                        "value": "GET"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "label": "POST", 
+                                                                                                                        "value": "POST"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "label": "DELETE", 
+                                                                                                                        "value": "DELETE"
+                                                                                                                    }
+                                                                                                                ],
+                                                                                                                "selected": "GET",
+                                                                                                                "label": "HTTP Method",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerHttpMethodChanged",
+                                                                                                                        "eventName": "SrsMuiSelect#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"HTTP_REQUEST\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerHttpMethod]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerBaseUrl",
+                                                                                                            "elementId": "actionHandlerBaseUrl",
+                                                                                                            "tag": "mui-text-field",
+                                                                                                            "props": {
+                                                                                                                "label": "Base URL",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerBaseUrlChanged",
+                                                                                                                        "eventName": "MuiTextField#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"HTTP_REQUEST\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerBaseUrl]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerPath",
+                                                                                                            "elementId": "actionHandlerPath",
+                                                                                                            "tag": "mui-text-field",
+                                                                                                            "props": {
+                                                                                                                "label": "PATH",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerPathChanged",
+                                                                                                                        "eventName": "MuiTextField#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"HTTP_REQUEST\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerPath]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerHeaders",
+                                                                                                            "elementId": "actionHandlerHeaders",
+                                                                                                            "tag": "srs-codeeditor",
+                                                                                                            "props": {
+                                                                                                                "label": "Headers",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerHeadersChanged",
+                                                                                                                        "eventName": "SrsCodeEditor#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"HTTP_REQUEST\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerHeaders]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerParams",
+                                                                                                            "elementId": "actionHandlerParams",
+                                                                                                            "tag": "srs-codeeditor",
+                                                                                                            "props": {
+                                                                                                                "label": "Params",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerParamsChanged",
+                                                                                                                        "eventName": "SrsCodeEditor#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"HTTP_REQUEST\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerParams]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerData",
+                                                                                                            "elementId": "actionHandlerData",
+                                                                                                            "tag": "srs-codeeditor",
+                                                                                                            "props": {
+                                                                                                                "label": "Data",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerDataChanged",
+                                                                                                                        "eventName": "SrsCodeEditor#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"HTTP_REQUEST\" && api.context.actionHandlerHttpMethod == \"POST\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerData]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerOutputMap",
+                                                                                                            "elementId": "actionHandlerOutputMap",
+                                                                                                            "tag": "srs-codeeditor",
+                                                                                                            "props": {
+                                                                                                                "label": "Http Response To Context Binding",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerOutputMapChanged",
+                                                                                                                        "eventName": "SrsCodeEditor#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"HTTP_REQUEST\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerOutputMap]]"
+                                                                                                            },
+                                                                                                            "children": []
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "name": "actionHandlerUpdateGlobalContext",
+                                                                                                            "elementId": "actionHandlerUpdateGlobalContext",
+                                                                                                            "tag": "srs-toggle",
+                                                                                                            "props": {
+                                                                                                                "label": "Update Global Context",
+                                                                                                                "variant": "outlined",
+                                                                                                                "fullWidth": true,
+                                                                                                                "style": "width: 100%;",
+                                                                                                                "sx": {
+                                                                                                                    "width": "100%",
+                                                                                                                    "marginTop": "5px"
+                                                                                                                },
+                                                                                                                "actionhandlers": [
+                                                                                                                    {
+                                                                                                                        "name": "actionHandlerUpdateGlobalContextChanged",
+                                                                                                                        "eventName": "SrsToggle#changed",
+                                                                                                                        "type": "script",
+                                                                                                                        "script": actionHandlerDataChanged,
+                                                                                                                        "stopPropagation": true
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            "overrides": {
+                                                                                                                "visible": "[[api.context.actionHandlerType == \"HTTP_REQUEST\"]]",
+                                                                                                                "misc": "[[{\"handlerName\": api.context.actionHandlerName}]]",
+                                                                                                                "value": "[[api.context.actionHandlerUpdateGlobalContext]]"
                                                                                                             },
                                                                                                             "children": []
                                                                                                         }
